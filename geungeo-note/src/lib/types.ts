@@ -56,7 +56,8 @@ export type SkillId =
   | "vocab"
   | "appreciation";
 
-export type Difficulty = "하" | "중" | "상";
+export type { Difficulty } from "./difficulty";
+import type { Difficulty } from "./difficulty";
 export type QuestionType = "mcq" | "ox";
 
 export interface Verification {

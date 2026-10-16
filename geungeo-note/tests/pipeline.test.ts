@@ -15,7 +15,7 @@ const base: Question = {
   choiceNotes: ["", "", "", "", ""],
   evidence: ["근거"],
   skill: "fact",
-  difficulty: "중",
+  difficulty: "school",
   verification: { status: "unverified", solverAnswerIndex: null, evidenceFound: false, issues: [] },
 };
 
@@ -72,7 +72,7 @@ describe("AI 출력 정리", () => {
 describe("데모 생성기", () => {
   it("라이브러리 지문은 검수된 예시 문항에서 요청 수만큼 고른다", () => {
     const passage = LIBRARY_PASSAGES.find((p) => p.id === "lib_heat_island")!;
-    const result = demoGenerate(passage, { mcqCount: 3, oxCount: 2, difficulty: "중", focusSkill: "inference" });
+    const result = demoGenerate(passage, { mcqCount: 3, oxCount: 2, difficulty: "school", focusSkill: "inference" });
     expect(result.items.filter((q) => q.type === "mcq")).toHaveLength(3);
     expect(result.items.filter((q) => q.type === "ox")).toHaveLength(2);
     expect(result.items.some((q) => q.skill === "inference")).toBe(true);
@@ -81,7 +81,7 @@ describe("데모 생성기", () => {
 
   it("<보기> 문항 수를 요청하면 <보기>가 있는 예시 문항을 포함한다", () => {
     const passage = LIBRARY_PASSAGES.find((p) => p.id === "lib_jdl_seosi")!;
-    const result = demoGenerate(passage, { mcqCount: 3, oxCount: 0, difficulty: "상", bogiCount: 1 });
+    const result = demoGenerate(passage, { mcqCount: 3, oxCount: 0, difficulty: "csat", bogiCount: 1 });
     expect(result.items.filter((q) => q.bogi)).toHaveLength(1);
   });
 
@@ -92,7 +92,7 @@ describe("데모 생성기", () => {
       ownerId: "u_t",
       text: "바다는 지구 표면의 대부분을 덮고 있다. 바닷물은 염분이 높다. 해류는 열을 운반한다. 깊은 바다는 빛이 거의 없다. 산호초는 많은 생물의 서식지이다. 조류는 달의 인력과 관계가 있다.",
     };
-    const result = demoGenerate(passage, { mcqCount: 1, oxCount: 2, difficulty: "하" });
+    const result = demoGenerate(passage, { mcqCount: 1, oxCount: 2, difficulty: "basic" });
     expect(result.items.length).toBeGreaterThan(0);
     for (const q of result.items) {
       expect(q.answerIndex).toBeLessThan(q.choices.length);
@@ -108,7 +108,7 @@ describe("데모 생성기", () => {
       ownerId: "u_t",
       text: "바다는 지구 표면의 대부분을 덮고 있다. 바닷물은 염분이 높다. 해류는 열을 운반한다. 깊은 바다는 빛이 거의 없다. 산호초는 많은 생물의 서식지이다. 조류는 달의 인력과 관계가 있다.",
     };
-    const { items } = demoGenerate(passage, { mcqCount: 3, oxCount: 0, difficulty: "하" });
+    const { items } = demoGenerate(passage, { mcqCount: 3, oxCount: 0, difficulty: "basic" });
     const answers = items.map((q) => q.choices[q.answerIndex]);
     expect(new Set(answers).size).toBe(items.length);
     for (const q of items) expect(q.choices.some((c) => c.includes("거의 있다"))).toBe(false);

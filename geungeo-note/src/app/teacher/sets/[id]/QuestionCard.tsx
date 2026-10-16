@@ -5,6 +5,7 @@ import { useState } from "react";
 import { AnswerExplanation, ChoiceNum, QuestionStem } from "@/components/QuestionParts";
 import { SkillBadge, VerificationBadge } from "@/components/badges";
 import { btn } from "@/components/ui";
+import { difficultyText } from "@/lib/difficulty";
 import type { Question } from "@/lib/types";
 
 const STATUS_BAR: Record<Question["verification"]["status"], string> = {
@@ -53,7 +54,7 @@ export function QuestionCard({
         <VerificationBadge v={v} />
         <SkillBadge skill={q.skill} />
         <span className="text-[13px] text-ink-3">
-          {q.type === "ox" ? "OX" : "5지선다"} · 난이도 {q.difficulty}
+          {q.type === "ox" ? "OX" : "5지선다"} · {difficultyText(q.difficulty)}
         </span>
       </header>
 

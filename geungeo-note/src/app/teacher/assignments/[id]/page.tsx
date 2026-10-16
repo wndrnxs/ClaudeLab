@@ -1,12 +1,13 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ConfidenceBadge, SkillBadge } from "@/components/badges";
+import { ConfidenceBadge, DifficultyFitTag, SkillBadge } from "@/components/badges";
 import { PassageView } from "@/components/PassageView";
 import { AnswerExplanation, QuestionStem } from "@/components/QuestionParts";
 import { Bar, PageTitle, Panel, SummaryStrip, Tag, btn, formatDate, pct } from "@/components/ui";
-import { assignmentStats, rate, weakestSkill } from "@/lib/analytics";
+import { type QuestionStat, assignmentStats, rate, weakestSkill } from "@/lib/analytics";
 import { requireRole } from "@/lib/auth";
 import { readDb } from "@/lib/db";
+import { DIFFICULTY_INFO, MIN_RESPONSES_TO_COMPARE, compareDifficulty, difficultyText } from "@/lib/difficulty";
 import { choiceLabel } from "@/lib/grading";
 import { SKILLS, skillLabel } from "@/lib/skills";
 import { InsightsButton } from "./InsightsButton";
@@ -30,6 +31,18 @@ export default async function AssignmentStatsPage({ params }: { params: Promise<
   const totalSureWrong = stats.questions.reduce((sum, q) => sum + q.sureButWrong, 0);
   const weak = weakestSkill(stats.skill);
   const notSubmitted = stats.classSize - stats.submittedCount;
+
+  // 응답이 적으면 우연의 영향이 커서 예상 난이도와 비교하지 않습니다.
+  const fitOf = (qs: QuestionStat) =>
+    qs.correctRate !== null && qs.responses >= MIN_RESPONSES_TO_COMPARE ? compareDifficulty(qs.question.difficulty, qs.correctRate) : null;
+  const numbersWhere = (fit: "harder" | "easier") =>
+    stats.questions
+      .filter((qs) => fitOf(qs) === fit)
+      .map((qs) => `${qs.number}번`)
+      .join(", ");
+  const harder = numbersWhere("harder");
+  const easier = numbersWhere("easier");
+  const compared = stats.questions.some((qs) => fitOf(qs) !== null);
 
   return (
     <>
@@ -64,15 +77,48 @@ export default async function AssignmentStatsPage({ params }: { params: Promise<
       </div>
 
       <div className="mb-6 grid gap-6 lg:grid-cols-2">
-        <Panel title="문항별 정답률" bodyClassName="space-y-3 p-5">
-          {stats.questions.map((q) => (
-            <Bar
-              key={q.question.id}
-              label={`${q.number}번 ${skillLabel(q.question.skill)}`}
-              value={q.correctRate}
-              detail={`${q.number}번: ${q.responses}명 중 ${q.correct}명 정답`}
-            />
-          ))}
+        <Panel title="문항별 정답률" bodyClassName="p-5">
+          <div className="space-y-3">
+            {stats.questions.map((q) => {
+              const info = DIFFICULTY_INFO[q.question.difficulty];
+              return (
+                <Bar
+                  key={q.question.id}
+                  label={`${q.number}번 ${skillLabel(q.question.skill)}`}
+                  value={q.correctRate}
+                  range={[info.min, info.max]}
+                  detail={`${q.number}번: ${q.responses}명 중 ${q.correct}명 정답 · ${info.label} 예상 ${info.range}`}
+                />
+              );
+            })}
+          </div>
+          <div className="mt-5 space-y-1 border-t border-line pt-4 text-[13px] leading-relaxed text-ink-2">
+            <p className="flex items-center gap-2">
+              <span className="inline-block h-3.5 w-6 shrink-0 rounded-sm border border-dashed border-ink-2" aria-hidden />
+              점선 상자: 출제할 때 정한 난이도의 예상 정답률
+            </p>
+            {compared ? (
+              <p>
+                {harder ? (
+                  <>
+                    예상보다 어려웠던 문항 <b className="text-wrong">{harder}</b>
+                  </>
+                ) : (
+                  "예상보다 어려웠던 문항 없음"
+                )}
+                {" · "}
+                {easier ? (
+                  <>
+                    예상보다 쉬웠던 문항 <b className="text-primary">{easier}</b>
+                  </>
+                ) : (
+                  "예상보다 쉬웠던 문항 없음"
+                )}
+              </p>
+            ) : (
+              <p>제출이 {MIN_RESPONSES_TO_COMPARE}명 이상이면 예상 정답률과 실제 정답률을 비교합니다.</p>
+            )}
+          </div>
         </Panel>
         <Panel title="평가 요소별 정답률" bodyClassName="p-5">
           <div className="space-y-3">
@@ -122,14 +168,18 @@ export default async function AssignmentStatsPage({ params }: { params: Promise<
           {stats.questions.map((qs) => {
             const q = qs.question;
             const insight = insightFor(q.id);
+            const fit = fitOf(qs);
             return (
               <article key={q.id} className="rounded-lg border border-line bg-surface p-5 sm:p-6">
                 <header className="mb-3 flex flex-wrap items-center gap-2">
                   <SkillBadge skill={q.skill} />
-                  <span className="text-[13px] text-ink-3">난이도 {q.difficulty}</span>
-                  <span className="ml-auto text-sm text-ink-2">
-                    정답률 <b className="text-ink tabular-nums">{pct(qs.correctRate)}</b>
-                    <span className="text-ink-3 tabular-nums"> ({qs.correct}/{qs.responses})</span>
+                  <span className="text-[13px] text-ink-3">{difficultyText(q.difficulty)}</span>
+                  <span className="ml-auto flex items-center gap-2 text-sm text-ink-2">
+                    {fit && <DifficultyFitTag fit={fit} />}
+                    <span>
+                      실제 정답률 <b className="text-ink tabular-nums">{pct(qs.correctRate)}</b>
+                      <span className="text-ink-3 tabular-nums"> ({qs.correct}/{qs.responses})</span>
+                    </span>
                   </span>
                 </header>
                 <QuestionStem q={q} number={qs.number} className="font-serif text-[16px] font-bold leading-relaxed" />

@@ -7,6 +7,7 @@ import { useState } from "react";
 import { PassageView } from "@/components/PassageView";
 import { Notice, btn } from "@/components/ui";
 import { postJson } from "@/lib/client";
+import { DIFFICULTY_INFO } from "@/lib/difficulty";
 import type { ClassRoom, Passage, Question, QuestionSet } from "@/lib/types";
 import { AssignPanel } from "./AssignPanel";
 import { QuestionCard } from "./QuestionCard";
@@ -85,7 +86,7 @@ export function SetEditor({
       <div className="mb-6 flex flex-wrap items-end gap-4">
         <div className="min-w-0 flex-1">
           <div className="mb-1 text-[13px] text-ink-3">
-            문항 세트 · {passage.title} · {set.source === "claude" ? "Claude 생성" : "데모 생성"}
+            문항 세트 · {passage.title} · 목표 난이도 {DIFFICULTY_INFO[set.spec.difficulty].label} · {set.source === "claude" ? "Claude 생성" : "데모 생성"}
           </div>
           <input
             className="-ml-1 w-full rounded-md border border-transparent bg-transparent px-1 font-serif text-[26px] font-bold hover:border-line focus:border-primary focus:outline-none"

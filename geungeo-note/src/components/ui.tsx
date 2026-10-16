@@ -178,6 +178,7 @@ export function Bar({
   color = "var(--color-series-1)",
   marker,
   markerLabel,
+  range,
   labelWidth = "9rem",
 }: {
   value: number | null;
@@ -187,6 +188,8 @@ export function Bar({
   /** 비교 기준선(예: 반 평균) 0~1 */
   marker?: number | null;
   markerLabel?: string;
+  /** 기대 범위(예: 예상 정답률) [최소, 최대] 0~1. 점선 상자로 표시합니다. */
+  range?: [number, number];
   labelWidth?: string;
 }) {
   const width = value === null ? 0 : Math.max(0, Math.min(1, value)) * 100;
@@ -199,6 +202,13 @@ export function Bar({
       <div className="truncate text-ink-2">{label}</div>
       <div className="relative h-2.5 rounded-sm bg-sunken">
         <div className="h-2.5 rounded-sm" style={{ width: `${width}%`, background: color }} />
+        {range && (
+          <div
+            className="absolute -inset-y-1 rounded-sm border border-dashed border-ink-2"
+            style={{ left: `${range[0] * 100}%`, width: `${(range[1] - range[0]) * 100}%` }}
+            aria-hidden
+          />
+        )}
         {marker !== undefined && marker !== null && (
           <div
             className="absolute -top-1.5 h-[22px] w-0.5 bg-series-2"

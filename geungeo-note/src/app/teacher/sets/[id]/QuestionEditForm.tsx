@@ -4,7 +4,8 @@ import { useState } from "react";
 import { btn, input, textarea } from "@/components/ui";
 import { CHOICE_MARKS } from "@/lib/grading";
 import { SKILLS } from "@/lib/skills";
-import type { Difficulty, Question, SkillId } from "@/lib/types";
+import { DIFFICULTIES, type Difficulty, difficultyText } from "@/lib/difficulty";
+import type { Question, SkillId } from "@/lib/types";
 
 export function QuestionEditForm({
   q,
@@ -96,9 +97,11 @@ export function QuestionEditForm({
           <label className="block">
             <span className="mb-1 block font-semibold">난이도</span>
             <select className={input} value={draft.difficulty} onChange={(e) => update({ difficulty: e.target.value as Difficulty })}>
-              <option value="하">하</option>
-              <option value="중">중</option>
-              <option value="상">상</option>
+              {DIFFICULTIES.map((d) => (
+                <option key={d} value={d}>
+                  {difficultyText(d)}
+                </option>
+              ))}
             </select>
           </label>
         </div>

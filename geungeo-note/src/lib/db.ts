@@ -1,5 +1,6 @@
 import { promises as fs } from "node:fs";
 import path from "node:path";
+import { normalizeDifficulty } from "./difficulty";
 import type { Database } from "./types";
 import { buildSeedDatabase } from "./seed";
 
@@ -22,13 +23,23 @@ const globalForDb = globalThis as unknown as { __gnDbQueue?: Promise<unknown> };
 async function loadOrSeed(): Promise<Database> {
   try {
     const raw = await fs.readFile(dbPath(), "utf8");
-    return JSON.parse(raw) as Database;
+    return migrate(JSON.parse(raw) as Database);
   } catch (err) {
     if ((err as NodeJS.ErrnoException).code !== "ENOENT") throw err;
     const seeded = buildSeedDatabase();
     await writeDb(seeded);
     return seeded;
   }
+}
+
+/** 예전 형식으로 저장된 데이터(난이도 '하/중/상')를 읽을 때 현재 형식으로 맞춥니다. */
+function migrate(db: Database): Database {
+  for (const set of db.sets) {
+    set.spec.difficulty = normalizeDifficulty(set.spec.difficulty);
+    for (const q of set.items) q.difficulty = normalizeDifficulty(q.difficulty);
+  }
+  for (const a of db.assignments) for (const q of a.items) q.difficulty = normalizeDifficulty(q.difficulty);
+  return db;
 }
 
 async function writeDb(db: Database): Promise<void> {

@@ -6,8 +6,9 @@ import { useEffect, useState } from "react";
 import { PassageView } from "@/components/PassageView";
 import { Card, Notice, btn, input, textarea } from "@/components/ui";
 import { postJson } from "@/lib/client";
+import { DIFFICULTIES, DIFFICULTY_INFO, type Difficulty } from "@/lib/difficulty";
 import { SKILLS } from "@/lib/skills";
-import type { Difficulty, Passage, SkillId } from "@/lib/types";
+import type { Passage, SkillId } from "@/lib/types";
 
 const STEPS = ["지문 분석", "문항·선지 생성", "근거 문장 대조", "정답 가리고 다시 풀기"];
 
@@ -26,7 +27,7 @@ export function GenerateForm({
   const [passageId, setPassageId] = useState(initialPassageId ?? "");
   const [mcqCount, setMcqCount] = useState(3);
   const [oxCount, setOxCount] = useState(2);
-  const [difficulty, setDifficulty] = useState<Difficulty>("중");
+  const [difficulty, setDifficulty] = useState<Difficulty>("school");
   const [focusSkill, setFocusSkill] = useState<SkillId | "">(initialSkill ?? "");
   const [bogiCount, setBogiCount] = useState(1);
   const [mixNegative, setMixNegative] = useState(true);
@@ -85,7 +86,7 @@ export function GenerateForm({
             </select>
           </label>
 
-          <div className="grid grid-cols-3 gap-3">
+          <div className="grid grid-cols-2 gap-3">
             <label className="block text-sm">
               <span className="mb-1.5 block font-semibold">5지선다</span>
               <input className={input} type="number" min={0} max={10} value={mcqCount} onChange={(e) => setMcqCount(Number(e.target.value))} />
@@ -94,15 +95,35 @@ export function GenerateForm({
               <span className="mb-1.5 block font-semibold">OX</span>
               <input className={input} type="number" min={0} max={10} value={oxCount} onChange={(e) => setOxCount(Number(e.target.value))} />
             </label>
-            <label className="block text-sm">
-              <span className="mb-1.5 block font-semibold">난이도</span>
-              <select className={input} value={difficulty} onChange={(e) => setDifficulty(e.target.value as Difficulty)}>
-                <option value="하">하</option>
-                <option value="중">중</option>
-                <option value="상">상</option>
-              </select>
-            </label>
           </div>
+
+          <fieldset className="text-sm">
+            <legend className="mb-1.5 font-semibold">난이도</legend>
+            <div className="grid grid-cols-2 gap-2">
+              {DIFFICULTIES.map((d) => {
+                const info = DIFFICULTY_INFO[d];
+                const selected = difficulty === d;
+                return (
+                  <label
+                    key={d}
+                    className={`cursor-pointer rounded-md px-3 py-2.5 ${
+                      selected ? "border-2 border-primary bg-primary-tint px-[11px] py-[9px]" : "border border-line-strong bg-surface hover:bg-paper"
+                    }`}
+                  >
+                    <input type="radio" name="difficulty" className="sr-only" checked={selected} onChange={() => setDifficulty(d)} />
+                    <span className={`block font-semibold ${selected ? "text-primary" : "text-ink"}`}>{info.label}</span>
+                    <span className="block text-[13px] tabular-nums text-ink-2">예상 정답률 {info.range}</span>
+                    <span className="block text-[13px] text-ink-3">{info.description}</span>
+                  </label>
+                );
+              })}
+            </div>
+            <p className="mt-2 text-[13px] leading-relaxed text-ink-3">
+              {mode === "demo"
+                ? "데모 모드에서는 미리 만든 예시 문항 중 고른 난이도에 가까운 문항을 넣습니다."
+                : "예상 정답률은 출제 목표입니다. 배포 후 과제 통계에서 반의 실제 정답률과 비교해 보여 드립니다."}
+            </p>
+          </fieldset>
 
           <fieldset className="grid grid-cols-[auto_1fr] items-center gap-x-3 gap-y-3 border-t border-line pt-4 text-sm">
             <legend className="mb-1 font-semibold">수능형 출제</legend>

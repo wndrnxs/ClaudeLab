@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { DIFFICULTIES } from "../difficulty";
 import { SKILL_IDS } from "../skills";
 
 /** Claude가 돌려줄 문항 형식(구조화 출력). 최종 검사는 normalize 단계에서 다시 합니다. */
@@ -12,7 +13,7 @@ export const GeneratedQuestionSchema = z.object({
   choiceNotes: z.array(z.string()).describe("선지별 판단 근거. choices와 같은 순서·개수"),
   evidence: z.array(z.string()).describe("지문에서 글자 그대로 복사한 근거 구절 1~3개"),
   skill: z.enum(SKILL_IDS),
-  difficulty: z.enum(["하", "중", "상"]),
+  difficulty: z.enum(DIFFICULTIES).describe("이 문항의 예상 난이도"),
 });
 
 export const GenerationOutputSchema = z.object({

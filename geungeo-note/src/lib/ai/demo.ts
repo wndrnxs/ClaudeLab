@@ -1,3 +1,4 @@
+import { DIFFICULTIES } from "../difficulty";
 import { CHOICE_MARKS, choiceLabel } from "../grading";
 import { newId } from "../ids";
 import { QUESTION_BANK } from "../library";
@@ -19,9 +20,13 @@ function cloneWithNewId(q: Question): Question {
 
 function fromBank(passageId: string, type: QuestionType, count: number, spec: GenerationSpec, excludeStems: Set<string>): Question[] {
   const bank = (QUESTION_BANK[passageId] ?? []).filter((q) => q.type === type && !excludeStems.has(q.stem));
-  const withBogi = type === "mcq" && spec.bogiCount ? bank.filter((q) => q.bogi).slice(0, spec.bogiCount) : [];
-  const focused = spec.focusSkill ? bank.filter((q) => q.skill === spec.focusSkill && !withBogi.includes(q)) : [];
-  const rest = bank.filter((q) => !focused.includes(q) && !withBogi.includes(q));
+  // 요청한 난이도에 가까운 문항부터 고릅니다(정렬은 안정 정렬이라 같은 거리면 은행 순서 유지).
+  const target = DIFFICULTIES.indexOf(spec.difficulty);
+  const distance = (q: Question) => Math.abs(DIFFICULTIES.indexOf(q.difficulty) - target);
+  const byFit = [...bank].sort((a, b) => distance(a) - distance(b));
+  const withBogi = type === "mcq" && spec.bogiCount ? byFit.filter((q) => q.bogi).slice(0, spec.bogiCount) : [];
+  const focused = spec.focusSkill ? byFit.filter((q) => q.skill === spec.focusSkill && !withBogi.includes(q)) : [];
+  const rest = byFit.filter((q) => !focused.includes(q) && !withBogi.includes(q));
   const picked = new Set([...withBogi, ...focused, ...rest].slice(0, count));
   // 고른 문항은 은행에 실린 순서(쉬운 문항 → <보기> 문항)대로 배치합니다.
   return bank.filter((q) => picked.has(q)).map(cloneWithNewId);
@@ -85,7 +90,7 @@ function heuristicOx(sentences: string[], count: number, offset: number): Questi
       choiceNotes: isTrue ? ["지문과 일치합니다.", "지문에 같은 내용이 있습니다."] : ["지문과 다릅니다.", "지문의 표현이 바뀌었습니다."],
       evidence: [original],
       skill: "fact",
-      difficulty: "하",
+      difficulty: "basic",
       verification: unverified([original]),
     });
   }
@@ -118,7 +123,7 @@ function heuristicMcq(sentences: string[], count: number, offset: number): Quest
       ),
       evidence: [correct],
       skill: "fact",
-      difficulty: "하",
+      difficulty: "basic",
       verification: unverified([correct]),
     });
   }

@@ -1,4 +1,5 @@
 import { AlertTriangle, Check, CheckCircle2, CircleDashed, PencilLine, X } from "lucide-react";
+import type { DifficultyFit } from "@/lib/difficulty";
 import { skillLabel } from "@/lib/skills";
 import type { Confidence, RightsKind, SkillId, Verification } from "@/lib/types";
 import { Tag } from "./ui";
@@ -64,4 +65,11 @@ export function ResultMark({ correct }: { correct: boolean }) {
       오답
     </Tag>
   );
+}
+
+/** 예상 정답률과 실제 정답률 비교 결과 */
+export function DifficultyFitTag({ fit }: { fit: DifficultyFit }) {
+  if (fit === "harder") return <Tag tone="wrong">예상보다 어려움</Tag>;
+  if (fit === "easier") return <Tag tone="primary">예상보다 쉬움</Tag>;
+  return <Tag tone="neutral">예상 범위</Tag>;
 }

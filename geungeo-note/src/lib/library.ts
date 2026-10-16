@@ -166,7 +166,7 @@ export const QUESTION_BANK: Record<string, Question[]> = {
       ],
       evidence: ["나 보기가 역겨워 가실 때에는 말없이 고이 보내 드리우리다", "나 보기가 역겨워 가실 때에는 죽어도 아니 눈물 흘리우리다"],
       skill: "structure",
-      difficulty: "하",
+      difficulty: "basic",
     }),
     bank({
       id: "bank_jdl_2",
@@ -191,7 +191,7 @@ export const QUESTION_BANK: Record<string, Question[]> = {
       ],
       evidence: ["말없이 고이 보내 드리우리다", "죽어도 아니 눈물 흘리우리다"],
       skill: "inference",
-      difficulty: "중",
+      difficulty: "school",
     }),
     bank({
       id: "bank_jdl_3",
@@ -216,7 +216,7 @@ export const QUESTION_BANK: Record<string, Question[]> = {
       ],
       evidence: ["사뿐히 즈려밟고 가시옵소서"],
       skill: "vocab",
-      difficulty: "하",
+      difficulty: "basic",
     }),
     bank({
       id: "bank_jdl_4",
@@ -241,7 +241,7 @@ export const QUESTION_BANK: Record<string, Question[]> = {
       ],
       evidence: ["아름 따다 가실 길에 뿌리우리다"],
       skill: "appreciation",
-      difficulty: "중",
+      difficulty: "school",
     }),
     bank({
       id: "bank_jdl_5",
@@ -266,7 +266,7 @@ export const QUESTION_BANK: Record<string, Question[]> = {
       ],
       evidence: ["죽어도 아니 눈물 흘리우리다"],
       skill: "critical",
-      difficulty: "상",
+      difficulty: "csat",
     }),
     bank({
       id: "bank_jdl_ox1",
@@ -277,7 +277,7 @@ export const QUESTION_BANK: Record<string, Question[]> = {
       choiceNotes: ["지문 내용과 일치합니다.", "2연에 꽃을 뿌리겠다는 내용이 있습니다."],
       evidence: ["아름 따다 가실 길에 뿌리우리다"],
       skill: "fact",
-      difficulty: "하",
+      difficulty: "basic",
     }),
     bank({
       id: "bank_jdl_ox2",
@@ -288,7 +288,7 @@ export const QUESTION_BANK: Record<string, Question[]> = {
       choiceNotes: ["지문에 함께 살던 집이라는 근거가 없습니다.", "진달래꽃이 피는 장소를 나타낼 뿐입니다."],
       evidence: ["영변에 약산 진달래꽃"],
       skill: "fact",
-      difficulty: "중",
+      difficulty: "school",
     }),
     bank({
       id: "bank_jdl_ox3",
@@ -299,7 +299,7 @@ export const QUESTION_BANK: Record<string, Question[]> = {
       choiceNotes: ["붙잡는 말은 나오지 않습니다.", "'말없이 고이 보내 드리우리다'와 어긋납니다."],
       evidence: ["말없이 고이 보내 드리우리다"],
       skill: "inference",
-      difficulty: "하",
+      difficulty: "basic",
     }),
   ],
   lib_heat_island: [
@@ -325,7 +325,7 @@ export const QUESTION_BANK: Record<string, Question[]> = {
       ],
       evidence: ["도시와 교외의 기온 차이는 낮보다 밤에 더 크게 나타나는 경우가 많다"],
       skill: "fact",
-      difficulty: "하",
+      difficulty: "basic",
     }),
     bank({
       id: "bank_hi_2",
@@ -350,7 +350,7 @@ export const QUESTION_BANK: Record<string, Question[]> = {
       ],
       evidence: ["흡수한 열을 오랫동안 저장한다", "도시는 밤이 되어도 쉽게 식지 않는다"],
       skill: "inference",
-      difficulty: "중",
+      difficulty: "school",
     }),
     bank({
       id: "bank_hi_3",
@@ -374,7 +374,7 @@ export const QUESTION_BANK: Record<string, Question[]> = {
       ],
       evidence: ["도시의 기온이 주변 교외 지역보다 높게 나타나는 현상을 도시 열섬 현상이라고 한다"],
       skill: "structure",
-      difficulty: "중",
+      difficulty: "school",
     }),
     bank({
       id: "bank_hi_4",
@@ -392,7 +392,7 @@ export const QUESTION_BANK: Record<string, Question[]> = {
       ],
       evidence: ["태양 에너지를 많이 흡수하고"],
       skill: "vocab",
-      difficulty: "하",
+      difficulty: "basic",
     }),
     bank({
       id: "bank_hi_5",
@@ -417,7 +417,7 @@ export const QUESTION_BANK: Record<string, Question[]> = {
       ],
       evidence: ["지역의 기후와 건물 구조에 따라 효과가 달라지므로, 도입 전에 충분한 검토가 필요하다"],
       skill: "critical",
-      difficulty: "상",
+      difficulty: "csat",
     }),
     bank({
       id: "bank_hi_ox1",
@@ -428,7 +428,7 @@ export const QUESTION_BANK: Record<string, Question[]> = {
       choiceNotes: ["1문단 내용과 일치합니다.", "1문단에 이름의 유래가 나옵니다."],
       evidence: ["마치 바다 위에 떠 있는 섬처럼 높은 기온으로 둘러싸여 나타나기 때문에 이러한 이름이 붙었다"],
       skill: "fact",
-      difficulty: "하",
+      difficulty: "basic",
     }),
     bank({
       id: "bank_hi_ox2",
@@ -439,7 +439,7 @@ export const QUESTION_BANK: Record<string, Question[]> = {
       choiceNotes: ["지문과 반대입니다.", "수증기로 바뀔 때 열을 흡수해 공기가 식습니다."],
       evidence: ["물이 수증기로 바뀔 때 주변의 열을 흡수하기 때문에 주변 공기가 식는다"],
       skill: "inference",
-      difficulty: "중",
+      difficulty: "school",
     }),
     bank({
       id: "bank_hi_ox3",
@@ -450,7 +450,7 @@ export const QUESTION_BANK: Record<string, Question[]> = {
       choiceNotes: ["3문단 내용과 일치합니다.", "3문단에 인공 열이 대기를 데운다고 나옵니다."],
       evidence: ["인공 열은 도시의 대기를 직접 데운다"],
       skill: "fact",
-      difficulty: "하",
+      difficulty: "basic",
     }),
     bank({
       id: "bank_hi_ox4",
@@ -461,7 +461,7 @@ export const QUESTION_BANK: Record<string, Question[]> = {
       choiceNotes: ["'항상 같다'는 지문과 어긋납니다.", "효과가 건물 구조에 따라 달라집니다."],
       evidence: ["지역의 기후와 건물 구조에 따라 효과가 달라지므로"],
       skill: "critical",
-      difficulty: "중",
+      difficulty: "school",
     }),
   ],
   lib_jdl_seosi: [
@@ -488,7 +488,7 @@ export const QUESTION_BANK: Record<string, Question[]> = {
       ],
       evidence: ["나 보기가 역겨워 가실 때에는", "죽는 날까지 하늘을 우러러"],
       skill: "structure",
-      difficulty: "중",
+      difficulty: "csat",
     }),
     bank({
       id: "bank_cmp_2",
@@ -513,7 +513,7 @@ export const QUESTION_BANK: Record<string, Question[]> = {
       ],
       evidence: ["말없이 고이 보내 드리우리다", "한 점 부끄럼이 없기를"],
       skill: "inference",
-      difficulty: "중",
+      difficulty: "csat",
     }),
     bank({
       id: "bank_cmp_3",
@@ -538,7 +538,7 @@ export const QUESTION_BANK: Record<string, Question[]> = {
       ],
       evidence: ["사뿐히 즈려밟고 가시옵소서", "잎새에 이는 바람에도 나는 괴로워했다."],
       skill: "appreciation",
-      difficulty: "중",
+      difficulty: "csat",
     }),
     bank({
       id: "bank_cmp_4",
@@ -565,7 +565,7 @@ export const QUESTION_BANK: Record<string, Question[]> = {
       ],
       evidence: ["죽어도 아니 눈물 흘리우리다", "나한테 주어진 길을 걸어가야겠다."],
       skill: "critical",
-      difficulty: "상",
+      difficulty: "hard",
     }),
     bank({
       id: "bank_cmp_5",
@@ -590,7 +590,7 @@ export const QUESTION_BANK: Record<string, Question[]> = {
       ],
       evidence: ["나는 괴로워했다.", "오늘 밤에도 별이 바람에 스치운다."],
       skill: "structure",
-      difficulty: "상",
+      difficulty: "hard",
     }),
     bank({
       id: "bank_cmp_ox1",
@@ -601,7 +601,7 @@ export const QUESTION_BANK: Record<string, Question[]> = {
       choiceNotes: ["두 작품 모두 자연물을 활용합니다.", "(가)의 진달래꽃, (나)의 별·바람이 그 예입니다."],
       evidence: ["영변에 약산 진달래꽃", "별을 노래하는 마음으로"],
       skill: "appreciation",
-      difficulty: "하",
+      difficulty: "basic",
     }),
     bank({
       id: "bank_cmp_ox2",
@@ -612,7 +612,7 @@ export const QUESTION_BANK: Record<string, Question[]> = {
       choiceNotes: ["지문과 반대입니다.", "'잎새에 이는 바람에도 나는 괴로워했다.'와 어긋납니다."],
       evidence: ["잎새에 이는 바람에도 나는 괴로워했다."],
       skill: "fact",
-      difficulty: "하",
+      difficulty: "basic",
     }),
   ],
 };

@@ -4,6 +4,7 @@ import { PassageText, splitComposite } from "@/components/PassageView";
 import { PrintButton } from "@/components/PrintButton";
 import { requireRole } from "@/lib/auth";
 import { readDb } from "@/lib/db";
+import { difficultyText } from "@/lib/difficulty";
 import { choiceLabel, choiceTopic } from "@/lib/grading";
 import { skillLabel } from "@/lib/skills";
 import type { Question } from "@/lib/types";
@@ -28,7 +29,7 @@ function ExplanationLine({ q, number }: { q: Question; number: number }) {
           <b>[오답 풀이]</b> {wrong.map((i) => `${choiceTopic(q, i)} ${q.choiceNotes[i]}`).join(" ")}
         </>
       )}
-      <span className="text-[#b42318]/70"> ({skillLabel(q.skill)} · 난이도 {q.difficulty})</span>
+      <span className="text-[#b42318]/70"> ({skillLabel(q.skill)} · {difficultyText(q.difficulty)})</span>
     </p>
   );
 }

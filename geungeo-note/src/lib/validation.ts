@@ -1,10 +1,11 @@
 import { z } from "zod";
+import { DIFFICULTIES } from "./difficulty";
 import { SKILL_IDS } from "./skills";
 
 export const SpecSchema = z.object({
   mcqCount: z.number().int().min(0).max(10),
   oxCount: z.number().int().min(0).max(10),
-  difficulty: z.enum(["하", "중", "상"]),
+  difficulty: z.enum(DIFFICULTIES),
   focusSkill: z.enum(SKILL_IDS).optional(),
   bogiCount: z.number().int().min(0).max(5).optional(),
   mixNegative: z.boolean().optional(),
@@ -29,7 +30,7 @@ export const EditableQuestionSchema = z
     choiceNotes: z.array(z.string().max(500)),
     evidence: z.array(z.string().trim().max(1000)),
     skill: z.enum(SKILL_IDS),
-    difficulty: z.enum(["하", "중", "상"]),
+    difficulty: z.enum(DIFFICULTIES),
   })
   .refine((q) => q.answerIndex < q.choices.length, { message: "정답 번호가 선지 범위를 벗어났습니다." })
   .refine((q) => (q.type === "mcq" ? q.choices.length === 5 : q.choices.length === 2), {
