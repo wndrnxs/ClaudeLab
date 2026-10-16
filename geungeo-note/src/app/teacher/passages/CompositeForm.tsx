@@ -43,11 +43,10 @@ export function CompositeForm({ passages }: { passages: { id: string; title: str
     >
       {select(a, setA, "(가)")}
       {select(b, setB, "(나)")}
-      {error && <p className="text-sm text-critical-ink">{error}</p>}
+      {error && <p className="text-sm text-wrong">{error}</p>}
       <button type="submit" className={`${btn.secondary} w-full`} disabled={pending || !a || !b || a === b}>
-        {pending ? "묶는 중…" : "(가)(나) 복합 지문 만들고 문항 만들기"}
+        {pending ? "묶는 중" : "복합 지문 만들기"}
       </button>
-      <p className="text-xs text-ink-3">두 작품을 비교하는 수능형 문항(예: &lsquo;(가)와 (나)의 공통점&rsquo;)을 만들 때 씁니다.</p>
     </form>
   );
 }

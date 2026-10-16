@@ -38,7 +38,7 @@ export function InsightsButton({
       >
         {pending ? "분석 중…" : hasInsights ? "다시 분석" : "오답 이유 분석하기"}
       </button>
-      {error && <p className="mt-1 text-xs text-critical-ink">{error}</p>}
+      {error && <p className="mt-1 text-xs text-wrong">{error}</p>}
     </div>
   );
 }

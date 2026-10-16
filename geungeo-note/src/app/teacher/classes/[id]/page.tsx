@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { Bar, Card, PageTitle, SectionTitle, TextLink, btn, pct } from "@/components/ui";
+import { Bar, PageTitle, Panel, btn, pct } from "@/components/ui";
 import { classSkillSummary, rate, studentReport, weakestSkill } from "@/lib/analytics";
 import { requireRole } from "@/lib/auth";
 import { readDb } from "@/lib/db";
@@ -18,52 +18,59 @@ export default async function ClassPage({ params }: { params: Promise<{ id: stri
 
   return (
     <>
-      <div className="mb-1 text-xs text-ink-3">
-        <TextLink href="/teacher">대시보드</TextLink> / 반
-      </div>
-      <PageTitle title={cls.name} sub={`학생 ${students.length}명 · 참여 코드 ${cls.joinCode}`} />
+      <PageTitle
+        eyebrow={`반 · 참여 코드 ${cls.joinCode}`}
+        title={cls.name}
+        sub={`학생 ${students.length}명. 학생은 회원가입할 때 참여 코드를 입력해 이 반에 들어옵니다.`}
+      />
       <div className="grid gap-6 lg:grid-cols-2">
-        <Card>
-          <SectionTitle hint="이 반에 배포한 모든 과제를 합친 결과입니다.">반 전체 평가 요소별 정답률</SectionTitle>
-          <div className="space-y-2.5">
+        <Panel title="영역별 정답률" action={<span className="text-[13px] text-ink-3">이 반의 모든 과제 합계</span>} bodyClassName="p-5">
+          <div className="space-y-3">
             {SKILLS.filter((s) => tally[s.id].total > 0).map((s) => (
-              <Bar key={s.id} label={s.label} value={rate(tally[s.id])} detail={`${tally[s.id].correct}/${tally[s.id].total}개 응답 정답`} />
+              <Bar
+                key={s.id}
+                label={s.label}
+                value={rate(tally[s.id])}
+                color={s.id === weak ? "var(--color-wrong)" : undefined}
+                detail={`응답 ${tally[s.id].total}개 중 ${tally[s.id].correct}개 정답`}
+              />
             ))}
           </div>
           {weak && (
-            <Link href={`/teacher/generate?focusSkill=${weak}`} className={`${btn.primary} mt-4`}>
+            <Link href={`/teacher/generate?focusSkill=${weak}`} className={`${btn.secondary} mt-5 w-full`}>
               {skillLabel(weak)} 복습 세트 만들기
             </Link>
           )}
-        </Card>
-        <Card>
-          <SectionTitle hint="이름을 누르면 학생별 약점 분석을 볼 수 있어요.">학생</SectionTitle>
+        </Panel>
+        <Panel title="학생" bodyClassName="">
           <table className="w-full text-sm">
-            <thead className="text-left text-xs text-ink-3">
-              <tr className="border-b border-line">
-                <th className="py-2 font-medium">이름</th>
-                <th className="py-2 text-right font-medium">정답률</th>
-                <th className="py-2 pl-4 font-medium">가장 약한 영역</th>
+            <thead className="bg-sunken text-left text-[13px] text-ink-2">
+              <tr>
+                <th className="px-5 py-2.5 font-medium">이름</th>
+                <th className="px-3 py-2.5 text-right font-medium">정답률</th>
+                <th className="px-5 py-2.5 font-medium">가장 약한 영역</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody className="divide-y divide-line">
               {students.map((s) => {
                 const r = studentReport(db, s);
                 return (
-                  <tr key={s.id} className="border-b border-line last:border-0">
-                    <td className="py-2.5">
-                      <TextLink href={`/teacher/students/${s.id}`}>{s.name}</TextLink>
+                  <tr key={s.id} className="hover:bg-paper">
+                    <td className="px-5 py-3">
+                      <Link href={`/teacher/students/${s.id}`} className="font-semibold underline decoration-line-strong underline-offset-4">
+                        {s.name}
+                      </Link>
                     </td>
-                    <td className="py-2.5 text-right font-semibold tabular-nums">{pct(rate(r.overall))}</td>
-                    <td className="py-2.5 pl-4 text-ink-2">
-                      {r.weakest[0] ? `${skillLabel(r.weakest[0].skill)} (${pct(rate(r.weakest[0].mine))})` : "–"}
+                    <td className="px-3 py-3 text-right font-semibold tabular-nums">{pct(rate(r.overall))}</td>
+                    <td className="px-5 py-3 text-ink-2">
+                      {r.weakest[0] ? `${skillLabel(r.weakest[0].skill)} ${pct(rate(r.weakest[0].mine))}` : "–"}
                     </td>
                   </tr>
                 );
               })}
             </tbody>
           </table>
-        </Card>
+        </Panel>
       </div>
     </>
   );

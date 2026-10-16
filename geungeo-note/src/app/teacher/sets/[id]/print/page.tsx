@@ -51,14 +51,14 @@ export default async function PrintPage({
   if (!passage) notFound();
 
   return (
-    <div className="exam mx-auto max-w-[210mm] bg-white px-10 py-8 text-[14.5px] leading-[1.75] shadow-sm print:max-w-none print:px-0 print:py-0 print:shadow-none">
-      <div className="no-print mb-6 space-y-2 rounded-lg bg-canvas p-3 font-sans text-sm">
+    <div className="exam mx-auto max-w-[210mm] bg-surface px-10 py-8 text-[14.5px] leading-[1.75] shadow-sm print:max-w-none print:px-0 print:py-0 print:shadow-none">
+      <div className="no-print mb-6 space-y-2 rounded-md border border-line bg-paper p-3 font-sans text-sm">
         <div className="flex flex-wrap items-center gap-2">
           {MODES.map((m) => (
             <Link
               key={m.mode}
               href={`/teacher/sets/${set.id}/print${m.query}`}
-              className={`rounded-full px-3 py-1 font-semibold ${mode === m.mode ? "bg-brand-700 text-white" : "bg-white text-ink-2 ring-1 ring-line"}`}
+              className={`rounded-md px-3 py-1.5 font-semibold ${mode === m.mode ? "bg-primary text-white" : "border border-line-strong bg-surface text-ink-2"}`}
             >
               {m.label}
             </Link>

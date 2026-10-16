@@ -38,13 +38,13 @@ export function SignupForm() {
         }
       }}
     >
-      <div className="grid grid-cols-2 gap-2 rounded-lg bg-canvas p-1">
+      <div className="grid grid-cols-2 gap-2 rounded-lg bg-sunken p-1">
         {(["student", "teacher"] as const).map((r) => (
           <button
             key={r}
             type="button"
             onClick={() => setRole(r)}
-            className={`rounded-md py-2 text-sm font-semibold ${role === r ? "bg-white shadow-sm" : "text-ink-2"}`}
+            className={`rounded-md py-2 text-sm font-semibold ${role === r ? "bg-surface shadow-sm" : "text-ink-2"}`}
           >
             {r === "student" ? "학생" : "선생님"}
           </button>
@@ -68,7 +68,7 @@ export function SignupForm() {
           <input className={`${input} uppercase`} value={form.joinCode} onChange={set("joinCode")} placeholder="선생님께 받은 6자리 코드 (데모: KOR2A1)" required />
         </label>
       )}
-      <label className="flex items-start gap-2 rounded-lg bg-canvas p-3 text-xs leading-relaxed text-ink-2">
+      <label className="flex items-start gap-2 rounded-lg bg-sunken p-3 text-xs leading-relaxed text-ink-2">
         <input type="checkbox" className="mt-0.5" checked={agree} onChange={(e) => setAgree(e.target.checked)} />
         <span>
           [필수] 개인정보 수집·이용 동의: 이름, 아이디, 학습 기록(답안·답을 고른 이유)을 수업 운영과 학습 분석 목적으로만
@@ -76,7 +76,7 @@ export function SignupForm() {
           {role === "student" && " 만 14세 미만은 보호자 동의가 필요합니다(정식 서비스에서 보호자 동의 절차 추가 예정)."}
         </span>
       </label>
-      {error && <p className="text-sm text-critical-ink">{error}</p>}
+      {error && <p className="text-sm text-wrong">{error}</p>}
       <button type="submit" className={`${btn.primary} w-full`} disabled={pending}>
         {pending ? "가입 중…" : "가입하기"}
       </button>

@@ -49,33 +49,60 @@ export function PassageView({
   passage,
   highlights = [],
   className = "",
+  collapsible = false,
 }: {
   passage: Passage;
   highlights?: string[];
   className?: string;
+  /** 좁은 화면에서 지문을 접을 수 있게 합니다. */
+  collapsible?: boolean;
 }) {
-  return (
-    <article className={`rounded-xl border border-line bg-white p-5 ${className}`}>
-      <header className="mb-3">
-        <div className="flex flex-wrap items-center gap-2">
-          <h2 className="text-lg font-bold">{passage.title}</h2>
-          <span className="text-sm text-ink-2">{passage.author}</span>
-          <span className="rounded bg-canvas px-1.5 py-0.5 text-xs text-ink-2">{passage.genre}</span>
-          {passage.sources && <span className="rounded bg-brand-50 px-1.5 py-0.5 text-xs text-brand-800">복합 지문</span>}
-        </div>
+  const head = (
+    <div className="min-w-0">
+      <div className="flex flex-wrap items-baseline gap-x-2 gap-y-1">
+        <h2 className="font-serif text-[19px] font-bold">{passage.title}</h2>
+        <span className="text-sm text-ink-2">{passage.author}</span>
+      </div>
+      <div className="mt-1 flex flex-wrap items-center gap-1.5 text-[13px] text-ink-3">
+        <span>{passage.genre}</span>
         {passage.sources && (
-          <p className="mt-1 text-xs text-ink-2">
-            {passage.sources.map((s) => `${s.label} ${s.title} — ${s.author}`).join(" · ")}
-          </p>
+          <>
+            <span aria-hidden>·</span>
+            <span>{passage.sources.map((s) => `${s.label} ${s.title}(${s.author})`).join(", ")}</span>
+          </>
         )}
-      </header>
-      <div className="text-[15px]">
+      </div>
+    </div>
+  );
+  const body = (
+    <>
+      <div className="text-[16px] sm:text-[17px]">
         <PassageText passage={passage} highlights={highlights} />
       </div>
-      <footer className="mt-4 flex flex-wrap items-center gap-2 border-t border-line pt-3 text-xs text-ink-3">
+      <footer className="mt-5 flex flex-wrap items-center gap-2 border-t border-line pt-3 text-[13px] text-ink-3">
         <RightsBadge kind={passage.rights.kind} />
         <span>{passage.rights.note}</span>
       </footer>
+    </>
+  );
+  if (collapsible) {
+    return (
+      <details open className={`group rounded-lg border border-line bg-surface ${className}`}>
+        <summary className="flex cursor-pointer list-none items-start justify-between gap-3 p-5 [&::-webkit-details-marker]:hidden">
+          {head}
+          <span className="shrink-0 pt-1 text-[13px] font-semibold text-primary">
+            <span className="group-open:hidden">지문 펼치기</span>
+            <span className="hidden group-open:inline">접기</span>
+          </span>
+        </summary>
+        <div className="px-5 pb-5">{body}</div>
+      </details>
+    );
+  }
+  return (
+    <article className={`rounded-lg border border-line bg-surface p-5 sm:p-6 ${className}`}>
+      <header className="mb-4">{head}</header>
+      {body}
     </article>
   );
 }

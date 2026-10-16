@@ -1,10 +1,11 @@
 "use client";
 
+import { Printer, RefreshCw, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { PassageView } from "@/components/PassageView";
-import { Card, SectionTitle, TextLink, btn } from "@/components/ui";
+import { Notice, btn } from "@/components/ui";
 import { postJson } from "@/lib/client";
 import type { ClassRoom, Passage, Question, QuestionSet } from "@/lib/types";
 import { AssignPanel } from "./AssignPanel";
@@ -81,13 +82,13 @@ export function SetEditor({
 
   return (
     <>
-      <div className="mb-6 flex flex-wrap items-end gap-3">
+      <div className="mb-6 flex flex-wrap items-end gap-4">
         <div className="min-w-0 flex-1">
-          <div className="mb-1 text-xs text-ink-3">
-            <TextLink href="/teacher">대시보드</TextLink> / 문항 세트 · {set.source === "claude" ? "Claude 생성" : "데모 생성"}
+          <div className="mb-1 text-[13px] text-ink-3">
+            문항 세트 · {passage.title} · {set.source === "claude" ? "Claude 생성" : "데모 생성"}
           </div>
           <input
-            className="w-full rounded-md border border-transparent bg-transparent px-1 text-2xl font-bold hover:border-line focus:border-brand-600 focus:outline-none"
+            className="-ml-1 w-full rounded-md border border-transparent bg-transparent px-1 font-serif text-[26px] font-bold hover:border-line focus:border-primary focus:outline-none"
             value={title}
             onChange={(e) => {
               setTitle(e.target.value);
@@ -98,6 +99,7 @@ export function SetEditor({
         </div>
         <div className="flex gap-2">
           <Link href={`/teacher/sets/${set.id}/print`} className={btn.secondary} target="_blank">
+            <Printer className="h-4 w-4" aria-hidden />
             학생용 인쇄
           </Link>
           <Link href={`/teacher/sets/${set.id}/print?answers=1`} className={btn.secondary} target="_blank">
@@ -106,15 +108,107 @@ export function SetEditor({
         </div>
       </div>
 
-      {error && <p className="mb-4 rounded-lg bg-red-50 px-3 py-2 text-sm text-critical-ink">{error}</p>}
+      {error && (
+        <div className="mb-4">
+          <Notice tone="wrong">{error}</Notice>
+        </div>
+      )}
 
-      <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.25fr)_18rem]">
-        <div className="lg:sticky lg:top-20 lg:h-fit">
+      <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)] xl:grid-cols-[minmax(0,0.85fr)_minmax(0,1.2fr)_17rem]">
+        <aside className="order-first grid gap-4 md:grid-cols-3 lg:col-span-2 xl:order-none xl:col-span-1 xl:col-start-3 xl:row-start-1 xl:sticky xl:top-6 xl:h-fit xl:grid-cols-1">
+          <section className="rounded-lg border border-line bg-surface p-4">
+            <h2 className="mb-3 text-sm font-bold">검증 결과</h2>
+            <dl className="space-y-1.5 text-sm">
+              <div className="flex justify-between">
+                <dt className="text-ink-2">전체 문항</dt>
+                <dd className="font-semibold tabular-nums">{items.length}</dd>
+              </div>
+              <div className="flex justify-between">
+                <dt className="text-correct">검증 통과</dt>
+                <dd className="font-semibold tabular-nums">{passedCount}</dd>
+              </div>
+              <div className="flex justify-between">
+                <dt className="text-wrong">재검토</dt>
+                <dd className="font-semibold tabular-nums">{flaggedCount}</dd>
+              </div>
+              <div className="flex justify-between">
+                <dt className="text-ink-2">수정·미검증</dt>
+                <dd className="font-semibold tabular-nums">{items.length - passedCount - flaggedCount}</dd>
+              </div>
+            </dl>
+            <button
+              type="button"
+              className={`${btn.secondary} mt-4 w-full`}
+              disabled={!!busy || dirty || items.length === 0}
+              onClick={() =>
+                run("verify:all", async () => applyServer(await postJson<QuestionSet>(`/api/sets/${set.id}/verify`, {})))
+              }
+            >
+              <RefreshCw className={`h-4 w-4 ${busy === "verify:all" ? "animate-spin" : ""}`} aria-hidden />
+              {busy === "verify:all" ? "검증하는 중" : "전체 다시 검증"}
+            </button>
+          </section>
+
+          <section className="rounded-lg border border-line bg-surface p-4">
+            <h2 className="mb-3 text-sm font-bold">저장 · 검토</h2>
+            <button type="button" className={`${btn.primary} w-full`} disabled={!dirty || !!busy} onClick={save}>
+              {busy === "save" ? "저장하는 중" : dirty ? "변경 사항 저장" : "저장됨"}
+            </button>
+            <label className="mt-4 flex items-start gap-2.5 text-sm">
+              <input
+                type="checkbox"
+                className="mt-1 h-4 w-4 accent-primary"
+                checked={set.reviewed}
+                disabled={dirty || !!busy}
+                onChange={(e) => setReviewed(e.target.checked)}
+              />
+              <span>
+                <b>검토 완료</b>
+                <span className="block text-[13px] text-ink-2">모든 문항의 정답·해설·근거를 확인했습니다.</span>
+              </span>
+            </label>
+          </section>
+
+          <section className="rounded-lg border border-line bg-surface p-4">
+            <h2 className="mb-3 text-sm font-bold">반에 배포</h2>
+            <AssignPanel setId={set.id} defaultTitle={title} classes={classes} disabledReason={assignDisabledReason} />
+            {assignments.length > 0 && (
+              <ul className="mt-4 space-y-1 border-t border-line pt-3 text-[13px]">
+                {assignments.map((a) => (
+                  <li key={a.id}>
+                    <Link href={`/teacher/assignments/${a.id}`} className="font-semibold underline decoration-line-strong underline-offset-4">
+                      {a.title}
+                    </Link>{" "}
+                    <span className="text-ink-3">{a.className}</span>
+                  </li>
+                ))}
+              </ul>
+            )}
+            <button
+              type="button"
+              className={`${btn.danger} mt-3 -ml-2.5`}
+              disabled={!!busy}
+              onClick={() =>
+                run("delete", async () => {
+                  if (!window.confirm("이 문항 세트를 삭제할까요? 이미 배포한 과제는 그대로 남습니다.")) return;
+                  await postJson(`/api/sets/${set.id}`, undefined, "DELETE");
+                  router.push("/teacher");
+                  router.refresh();
+                })
+              }
+            >
+              <Trash2 className="h-4 w-4" aria-hidden />
+              세트 삭제
+            </button>
+          </section>
+        </aside>
+
+        <div className="lg:sticky lg:top-6 lg:h-fit xl:col-start-1 xl:row-start-1">
           <PassageView passage={passage} highlights={selected?.evidence ?? []} />
-          <p className="mt-2 text-xs text-ink-3">문항을 누르면 그 문항의 근거 문장이 지문에 노란색으로 표시됩니다.</p>
+          <p className="mt-2 text-[13px] text-ink-3">문항을 누르면 그 문항의 근거 문장을 지문에 표시합니다.</p>
         </div>
 
-        <div className="space-y-4">
+        <div className="space-y-5 xl:col-start-2 xl:row-start-1">
           {items.map((q, i) =>
             editingId === q.id ? (
               <QuestionEditForm
@@ -161,91 +255,6 @@ export function SetEditor({
           )}
           {items.length === 0 && <p className="text-sm text-ink-3">문항이 없습니다.</p>}
         </div>
-
-        <aside className="space-y-4 lg:sticky lg:top-20 lg:h-fit">
-          <Card className="!p-4">
-            <SectionTitle>검증 요약</SectionTitle>
-            <dl className="space-y-1 text-sm">
-              <div className="flex justify-between">
-                <dt className="text-ink-2">전체 문항</dt>
-                <dd className="font-semibold">{items.length}</dd>
-              </div>
-              <div className="flex justify-between">
-                <dt className="text-good-ink">✓ 검증 통과</dt>
-                <dd className="font-semibold">{passedCount}</dd>
-              </div>
-              <div className="flex justify-between">
-                <dt className="text-critical-ink">! 재검토 필요</dt>
-                <dd className="font-semibold">{flaggedCount}</dd>
-              </div>
-              <div className="flex justify-between">
-                <dt className="text-ink-2">수정·미검증</dt>
-                <dd className="font-semibold">{items.length - passedCount - flaggedCount}</dd>
-              </div>
-            </dl>
-            <button
-              type="button"
-              className={`${btn.secondary} mt-3 w-full`}
-              disabled={!!busy || dirty || items.length === 0}
-              onClick={() =>
-                run("verify:all", async () => applyServer(await postJson<QuestionSet>(`/api/sets/${set.id}/verify`, {})))
-              }
-            >
-              {busy === "verify:all" ? "전체 검증 중…" : "↻ 전체 다시 검증"}
-            </button>
-          </Card>
-
-          <Card className="!p-4">
-            <SectionTitle>저장 · 검토</SectionTitle>
-            <button type="button" className={`${btn.primary} w-full`} disabled={!dirty || !!busy} onClick={save}>
-              {busy === "save" ? "저장 중…" : dirty ? "변경 사항 저장" : "저장됨"}
-            </button>
-            <label className="mt-3 flex items-start gap-2 text-sm">
-              <input
-                type="checkbox"
-                className="mt-1"
-                checked={set.reviewed}
-                disabled={dirty || !!busy}
-                onChange={(e) => setReviewed(e.target.checked)}
-              />
-              <span>
-                <b>검토 완료</b>
-                <span className="block text-xs text-ink-2">모든 문항의 정답·해설·근거를 확인했습니다.</span>
-              </span>
-            </label>
-          </Card>
-
-          <Card className="!p-4">
-            <SectionTitle>반에 배포</SectionTitle>
-            <AssignPanel setId={set.id} defaultTitle={title} classes={classes} disabledReason={assignDisabledReason} />
-            {assignments.length > 0 && (
-              <ul className="mt-3 space-y-1 border-t border-line pt-3 text-xs">
-                {assignments.map((a) => (
-                  <li key={a.id}>
-                    <TextLink href={`/teacher/assignments/${a.id}`}>{a.title}</TextLink>{" "}
-                    <span className="text-ink-3">({a.className})</span>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </Card>
-
-          <button
-            type="button"
-            className={`${btn.danger} w-full`}
-            disabled={!!busy}
-            onClick={() =>
-              run("delete", async () => {
-                if (!window.confirm("이 문항 세트를 삭제할까요? 이미 배포한 과제는 그대로 남습니다.")) return;
-                await postJson(`/api/sets/${set.id}`, undefined, "DELETE");
-                router.push("/teacher");
-                router.refresh();
-              })
-            }
-          >
-            세트 삭제
-          </button>
-        </aside>
       </div>
     </>
   );

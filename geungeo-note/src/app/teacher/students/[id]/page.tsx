@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import { StudentReportView } from "@/components/StudentReportView";
-import { PageTitle, TextLink } from "@/components/ui";
+import { PageTitle } from "@/components/ui";
 import { studentReport } from "@/lib/analytics";
 import { requireRole } from "@/lib/auth";
 import { readDb } from "@/lib/db";
@@ -16,10 +16,7 @@ export default async function TeacherStudentPage({ params }: { params: Promise<{
 
   return (
     <>
-      <div className="mb-1 text-xs text-ink-3">
-        <TextLink href="/teacher">대시보드</TextLink> / 학생 약점 분석
-      </div>
-      <PageTitle title={`${student.name} 학생`} sub={`${classNames.join(", ")} · 학생 화면과 같은 분석입니다.`} />
+      <PageTitle eyebrow={`${classNames.join(", ")} · 학생 화면과 같은 분석`} title={`${student.name} 학생`} />
       <StudentReportView report={studentReport(db, student)} viewer="teacher" />
     </>
   );

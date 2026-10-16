@@ -8,7 +8,7 @@ export default function SignupPage() {
       <SignupForm />
       <p className="mt-5 text-center text-sm text-ink-2">
         이미 계정이 있나요?{" "}
-        <Link href="/login" className="font-semibold text-brand-700 hover:underline">
+        <Link href="/login" className="font-semibold text-primary hover:underline">
           로그인
         </Link>
       </p>

@@ -1,5 +1,4 @@
 import { notFound } from "next/navigation";
-import { TextLink } from "@/components/ui";
 import { requireRole } from "@/lib/auth";
 import { readDb } from "@/lib/db";
 import { ResultView } from "./ResultView";
@@ -17,9 +16,6 @@ export default async function StudentAssignmentPage({ params }: { params: Promis
 
   return (
     <>
-      <div className="mb-1 text-xs text-ink-3">
-        <TextLink href="/student">내 과제</TextLink> / {assignment.title}
-      </div>
       {submission ? (
         <ResultView title={assignment.title} passage={passage} items={assignment.items} submission={submission} />
       ) : (

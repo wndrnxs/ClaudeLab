@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { btn, input } from "@/components/ui";
+import { btn, input, textarea } from "@/components/ui";
 import { CHOICE_MARKS } from "@/lib/grading";
 import { SKILLS } from "@/lib/skills";
 import type { Difficulty, Question, SkillId } from "@/lib/types";
@@ -22,18 +22,18 @@ export function QuestionEditForm({
   const update = (patch: Partial<Question>) => setDraft((d) => ({ ...d, ...patch }));
 
   return (
-    <article className="rounded-xl border-2 border-brand-600 bg-white p-4">
+    <article className="rounded-lg border-2 border-primary bg-surface p-4">
       <h3 className="mb-3 font-bold">{number}번 문항 편집</h3>
       <div className="space-y-3 text-sm">
         <label className="block">
           <span className="mb-1 block font-semibold">발문</span>
-          <textarea className={`${input} min-h-20`} value={draft.stem} onChange={(e) => update({ stem: e.target.value })} />
+          <textarea className={`${textarea} min-h-20`} value={draft.stem} onChange={(e) => update({ stem: e.target.value })} />
         </label>
 
         <label className="block">
           <span className="mb-1 block font-semibold">&lt;보기&gt; (선택)</span>
           <textarea
-            className={`${input} min-h-16`}
+            className={`${textarea} min-h-16`}
             placeholder="<보기>가 필요한 문항이면 내용을 적으세요. 비워 두면 <보기> 없이 출제됩니다."
             value={draft.bogi ?? ""}
             onChange={(e) => update({ bogi: e.target.value })}
@@ -74,12 +74,12 @@ export function QuestionEditForm({
 
         <label className="block">
           <span className="mb-1 block font-semibold">해설</span>
-          <textarea className={`${input} min-h-16`} value={draft.explanation} onChange={(e) => update({ explanation: e.target.value })} />
+          <textarea className={`${textarea} min-h-16`} value={draft.explanation} onChange={(e) => update({ explanation: e.target.value })} />
         </label>
 
         <label className="block">
           <span className="mb-1 block font-semibold">근거 문장 (한 줄에 하나, 지문에서 그대로 복사)</span>
-          <textarea className={`${input} min-h-16`} value={evidenceText} onChange={(e) => setEvidenceText(e.target.value)} />
+          <textarea className={`${textarea} min-h-16`} value={evidenceText} onChange={(e) => setEvidenceText(e.target.value)} />
         </label>
 
         <div className="grid grid-cols-2 gap-3">

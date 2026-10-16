@@ -27,8 +27,8 @@ export function AssignPanel({
 
   if (created) {
     return (
-      <div className="rounded-lg bg-green-50 p-3 text-sm text-good-ink">
-        ✓ 과제를 배포했습니다. 학생 화면의 &lsquo;내 과제&rsquo;에 바로 나타납니다.
+      <div className="rounded-md border border-[#bcdcc6] bg-correct-tint p-3 text-sm text-correct">
+        과제를 배포했습니다. 학생의 &lsquo;내 과제&rsquo;에 바로 나타납니다.
         <div className="mt-2 flex gap-2">
           <Link href={`/teacher/assignments/${created}`} className={btn.secondary}>
             제출 현황·통계 보기
@@ -71,14 +71,14 @@ export function AssignPanel({
         <span className="mb-1 block text-xs text-ink-2">마감일 (선택)</span>
         <input className={input} type="date" value={due} onChange={(e) => setDue(e.target.value)} />
       </label>
-      <label className="flex items-start gap-2 text-xs text-ink-2">
-        <input type="checkbox" className="mt-0.5" checked={requireReason} onChange={(e) => setRequireReason(e.target.checked)} />
+      <label className="flex items-start gap-2.5 text-[13px] text-ink-2">
+        <input type="checkbox" className="mt-0.5 h-4 w-4 accent-primary" checked={requireReason} onChange={(e) => setRequireReason(e.target.checked)} />
         <span>
-          문항마다 <b>답을 고른 이유</b>를 쓰게 하기 (오답 원인 분석에 쓰여요)
+          문항마다 <b className="text-ink">답을 고른 이유</b>를 받습니다. 오답 원인 분석에 쓰입니다.
         </span>
       </label>
-      {error && <p className="text-critical-ink">{error}</p>}
-      {disabledReason && <p className="text-xs text-warning-ink">{disabledReason}</p>}
+      {error && <p className="text-wrong">{error}</p>}
+      {disabledReason && <p className="text-[13px] text-caution">{disabledReason}</p>}
       <button type="submit" className={`${btn.primary} w-full`} disabled={pending || !!disabledReason || !classId}>
         {pending ? "배포 중…" : "학생에게 배포"}
       </button>

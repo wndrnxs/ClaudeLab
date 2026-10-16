@@ -1,31 +1,31 @@
 import Link from "next/link";
 import { RightsBadge } from "@/components/badges";
-import { Card, PageTitle, SectionTitle, btn } from "@/components/ui";
+import { PageTitle, Panel, Tag, btn } from "@/components/ui";
 import { requireRole } from "@/lib/auth";
 import { readDb } from "@/lib/db";
 import type { Passage } from "@/lib/types";
 import { CompositeForm } from "./CompositeForm";
 import { PassageForm } from "./PassageForm";
 
-function PassageCard({ p }: { p: Passage }) {
+function PassageRow({ p }: { p: Passage }) {
   return (
-    <li className="flex flex-col rounded-xl border border-line bg-white p-4">
-      <div className="flex flex-wrap items-center gap-2">
-        <h3 className="font-bold">{p.title}</h3>
-        <span className="text-sm text-ink-2">{p.author}</span>
-        <span className="rounded bg-canvas px-1.5 py-0.5 text-xs text-ink-2">{p.genre}</span>
-        {p.sources && <span className="rounded bg-brand-50 px-1.5 py-0.5 text-xs text-brand-800">복합 지문</span>}
-      </div>
-      <p className="mt-2 line-clamp-3 flex-1 whitespace-pre-line text-sm text-ink-2">{p.text}</p>
-      <div className="mt-3 flex items-center justify-between gap-2">
-        <span className="flex min-w-0 items-center gap-2 text-xs text-ink-3">
+    <li className="flex flex-col gap-3 px-5 py-4 sm:flex-row sm:items-start">
+      <div className="min-w-0 flex-1">
+        <div className="flex flex-wrap items-baseline gap-x-2 gap-y-1">
+          <h3 className="font-serif text-[17px] font-bold">{p.title}</h3>
+          <span className="text-sm text-ink-2">{p.author}</span>
+          <span className="text-[13px] text-ink-3">{p.genre}</span>
+          {p.sources && <Tag tone="primary">복합 지문</Tag>}
+        </div>
+        <p className="mt-1.5 line-clamp-2 font-serif text-sm leading-relaxed whitespace-pre-line text-ink-2">{p.text}</p>
+        <div className="mt-2 flex min-w-0 items-center gap-2 text-[13px] text-ink-3">
           <RightsBadge kind={p.rights.kind} />
           <span className="truncate">{p.rights.note}</span>
-        </span>
-        <Link href={`/teacher/generate?passageId=${p.id}`} className={`${btn.secondary} shrink-0 !px-3 !py-1.5`}>
-          문항 만들기
-        </Link>
+        </div>
       </div>
+      <Link href={`/teacher/generate?passageId=${p.id}`} className={btn.small}>
+        문항 만들기
+      </Link>
     </li>
   );
 }
@@ -38,47 +38,47 @@ export default async function PassagesPage() {
 
   return (
     <>
-      <PageTitle title="지문" sub="기본 라이브러리에는 저작권이 만료된 작품과 직접 집필한 지문만 있습니다." />
-      <div className="grid gap-6 lg:grid-cols-[1.5fr_1fr]">
+      <PageTitle
+        title="지문"
+        sub="기본 라이브러리에는 저작권이 만료된 작품과 직접 쓴 지문만 넣었습니다. 교과서·EBS·모의고사 지문은 제공하지 않습니다."
+      />
+      <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_380px]">
         <div className="space-y-6">
-          <section>
-            <SectionTitle hint="교과서·EBS·모의고사 지문은 저작권 문제로 제공하지 않습니다.">기본 라이브러리</SectionTitle>
-            <ul className="grid gap-3 md:grid-cols-2">
+          <Panel title="기본 라이브러리" action={<span className="text-[13px] text-ink-3">{library.length}편</span>} bodyClassName="">
+            <ul className="divide-y divide-line">
               {library.map((p) => (
-                <PassageCard key={p.id} p={p} />
+                <PassageRow key={p.id} p={p} />
               ))}
             </ul>
-          </section>
-          <section>
-            <SectionTitle hint="선생님이 등록한 지문은 선생님 계정과 선생님 반에서만 쓰입니다.">내가 등록한 지문</SectionTitle>
+          </Panel>
+          <Panel
+            title="내가 등록한 지문"
+            action={<span className="text-[13px] text-ink-3">내 계정과 내 반에서만 쓰입니다</span>}
+            bodyClassName=""
+          >
             {mine.length === 0 ? (
-              <p className="rounded-lg border border-dashed border-line px-4 py-6 text-center text-sm text-ink-3">
-                오른쪽에서 지문을 등록해 보세요.
-              </p>
+              <p className="px-5 py-6 text-sm text-ink-2">등록한 지문이 없습니다.</p>
             ) : (
-              <ul className="grid gap-3 md:grid-cols-2">
+              <ul className="divide-y divide-line">
                 {mine.map((p) => (
-                  <PassageCard key={p.id} p={p} />
+                  <PassageRow key={p.id} p={p} />
                 ))}
               </ul>
             )}
-          </section>
+          </Panel>
         </div>
-        <div className="h-fit space-y-6">
-          <Card>
-            <SectionTitle hint="이미 등록된 두 작품을 (가), (나)로 묶습니다. 권리 근거는 원래 지문을 그대로 따릅니다.">
-              복합 지문 만들기
-            </SectionTitle>
+        <div className="space-y-6">
+          <Panel title="지문 등록">
+            <PassageForm />
+          </Panel>
+          <Panel title="복합 지문 만들기">
+            <p className="mb-3 text-[13px] text-ink-2">등록된 두 작품을 (가), (나)로 묶습니다. 권리 근거는 원래 지문을 따릅니다.</p>
             <CompositeForm
               passages={[...library, ...mine]
                 .filter((p) => !p.sources)
                 .map((p) => ({ id: p.id, title: p.title, author: p.author }))}
             />
-          </Card>
-          <Card>
-            <SectionTitle>지문 등록</SectionTitle>
-            <PassageForm />
-          </Card>
+          </Panel>
         </div>
       </div>
     </>

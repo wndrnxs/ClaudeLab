@@ -44,7 +44,7 @@ export function LoginForm() {
           required
         />
       </label>
-      {error && <p className="text-sm text-critical-ink">{error}</p>}
+      {error && <p className="text-sm text-wrong">{error}</p>}
       <button type="submit" className={`${btn.primary} w-full`} disabled={pending}>
         {pending ? "로그인 중…" : "로그인"}
       </button>

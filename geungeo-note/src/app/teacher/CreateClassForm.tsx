@@ -12,7 +12,7 @@ export function CreateClassForm() {
   const [pending, setPending] = useState(false);
   return (
     <form
-      className="flex gap-2"
+      className="flex flex-wrap gap-2"
       onSubmit={async (e) => {
         e.preventDefault();
         setPending(true);
@@ -28,11 +28,11 @@ export function CreateClassForm() {
         }
       }}
     >
-      <input className={input} value={name} onChange={(e) => setName(e.target.value)} placeholder="새 반 이름 (예: 고1 B반)" />
+      <input className={`${input} min-w-0 flex-1`} value={name} onChange={(e) => setName(e.target.value)} placeholder="반 이름 (예: 고1 B반)" />
       <button type="submit" className={`${btn.secondary} shrink-0 whitespace-nowrap`} disabled={pending || !name.trim()}>
         반 만들기
       </button>
-      {error && <p className="text-sm text-critical-ink">{error}</p>}
+      {error && <p className="text-sm text-wrong">{error}</p>}
     </form>
   );
 }

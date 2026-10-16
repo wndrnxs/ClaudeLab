@@ -1,11 +1,17 @@
+import { Plus } from "lucide-react";
 import Link from "next/link";
-import { aiMode } from "@/lib/ai/pipeline";
-import { classSkillSummary, rate, weakestSkill } from "@/lib/analytics";
+import { assignmentStats, classSkillSummary, rate, weakestSkill } from "@/lib/analytics";
 import { requireRole } from "@/lib/auth";
 import { readDb } from "@/lib/db";
-import { skillLabel } from "@/lib/skills";
-import { Card, Empty, PageTitle, SectionTitle, Stat, TextLink, btn, formatDate, pct } from "@/components/ui";
+import { SKILLS, skillLabel } from "@/lib/skills";
+import { Empty, PageTitle, Panel, SummaryStrip, Tag, TextLink, btn, dday, pct } from "@/components/ui";
 import { CreateClassForm } from "./CreateClassForm";
+
+const WEEKDAYS = ["일", "월", "화", "수", "목", "금", "토"];
+
+function todayLabel(d = new Date()) {
+  return `${d.getMonth() + 1}월 ${d.getDate()}일 ${WEEKDAYS[d.getDay()]}요일`;
+}
 
 export default async function TeacherDashboard() {
   const teacher = await requireRole("teacher");
@@ -16,84 +22,110 @@ export default async function TeacherDashboard() {
     .filter((a) => a.teacherId === teacher.id)
     .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
   const studentsIn = (classId: string) => db.users.filter((u) => u.role === "student" && u.classIds.includes(classId));
-  const totalStudents = new Set(classes.flatMap((c) => studentsIn(c.id).map((s) => s.id))).size;
-  const pendingReview = sets.filter((s) => !s.reviewed).length;
+  const stats = assignments.map((a) => ({ a, s: assignmentStats(db, a), due: dday(a.dueAt) }));
+
+  const pendingSets = sets.filter((s) => !s.reviewed);
+  const flaggedCount = pendingSets.reduce((n, s) => n + s.items.filter((q) => q.verification.status === "flagged").length, 0);
+  const open = stats.filter((x) => x.due?.open ?? true);
+  const missing = open.flatMap((x) => x.s.students.filter((r) => !r.submission).map((r) => r.student.name));
+  const firstClass = classes[0];
+  const classTally = firstClass ? classSkillSummary(db, firstClass.id) : null;
+  const weak = classTally ? weakestSkill(classTally) : null;
 
   return (
     <>
       <PageTitle
-        title={`안녕하세요, ${teacher.name} 선생님`}
-        sub="지문을 고르고 문항을 만든 뒤, 검토를 마치면 반에 바로 배포할 수 있어요."
+        eyebrow={todayLabel()}
+        title="오늘 확인할 일"
         action={
           <Link href="/teacher/generate" className={btn.primary}>
-            + 새 문항 만들기
+            <Plus className="h-4 w-4" aria-hidden />새 문항 만들기
           </Link>
         }
       />
 
-      {aiMode() === "demo" && (
-        <div className="mb-6 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-warning-ink">
-          <b>데모 모드로 실행 중입니다.</b> Claude API 키(<code>ANTHROPIC_API_KEY</code>)가 없어서 라이브러리 지문은 미리 검수한
-          예시 문항을, 직접 등록한 지문은 규칙 기반 문항을 만들어요. 키를 설정하면 AI 생성과 자동 풀이 검증이 켜집니다.
-        </div>
-      )}
-
-      <div className="mb-8 grid grid-cols-2 gap-3 md:grid-cols-4">
-        <Stat label="운영 중인 반" value={classes.length} />
-        <Stat label="학생" value={`${totalStudents}명`} />
-        <Stat label="배포한 과제" value={assignments.length} />
-        <Stat label="검토 대기 세트" value={pendingReview} sub={pendingReview ? "검토 후 배포할 수 있어요" : "모두 검토 완료"} />
+      <div className="mb-6">
+        <SummaryStrip
+          items={[
+            {
+              label: "검토 대기 문항 세트",
+              value: pendingSets.length,
+              sub: flaggedCount ? `재검토 표시 ${flaggedCount}문항` : "재검토 표시 없음",
+              tone: flaggedCount ? "wrong" : "default",
+            },
+            {
+              label: "진행 중 과제",
+              value: open.length,
+              sub: open[0] ? `${open[0].a.title}${open[0].due ? ` · ${open[0].due.label}` : ""}` : "없음",
+            },
+            {
+              label: "미제출 학생",
+              value: `${missing.length}명`,
+              sub: missing.length ? missing.slice(0, 3).join(", ") : "모두 제출",
+            },
+            {
+              label: "반 약점 영역",
+              value: weak && classTally ? pct(rate(classTally[weak])) : "–",
+              sub: weak ? skillLabel(weak) : "데이터 부족",
+              tone: weak ? "wrong" : "default",
+            },
+          ]}
+        />
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-[1.4fr_1fr]">
+      <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_340px]">
         <div className="space-y-6">
-          <Card>
-            <SectionTitle hint="정답률과 학생들이 답을 고른 이유를 과제별로 확인하세요.">과제 현황</SectionTitle>
-            {assignments.length === 0 ? (
-              <Empty>아직 배포한 과제가 없습니다.</Empty>
+          <Panel title="과제 현황" bodyClassName="">
+            {stats.length === 0 ? (
+              <div className="p-5">
+                <Empty>아직 배포한 과제가 없습니다.</Empty>
+              </div>
             ) : (
               <div className="overflow-x-auto">
-                <table className="w-full text-sm">
-                  <thead className="text-left text-xs text-ink-3">
-                    <tr className="border-b border-line">
-                      <th className="py-2 font-medium">과제</th>
-                      <th className="py-2 font-medium">반</th>
-                      <th className="py-2 text-right font-medium">제출</th>
-                      <th className="py-2 text-right font-medium">평균 정답률</th>
-                      <th className="py-2 text-right font-medium">마감</th>
+                <table className="w-full min-w-[560px] text-sm">
+                  <thead className="bg-sunken text-left text-[13px] text-ink-2">
+                    <tr>
+                      <th className="px-5 py-2.5 font-medium">과제</th>
+                      <th className="px-3 py-2.5 font-medium">반</th>
+                      <th className="px-3 py-2.5 text-right font-medium">제출</th>
+                      <th className="px-3 py-2.5 font-medium">평균 정답률</th>
+                      <th className="px-5 py-2.5 text-right font-medium">마감</th>
                     </tr>
                   </thead>
-                  <tbody>
-                    {assignments.map((a) => {
-                      const subs = db.submissions.filter((s) => s.assignmentId === a.id);
-                      const avg = subs.length
-                        ? subs.reduce((sum, s) => sum + s.correctCount / s.total, 0) / subs.length
-                        : null;
-                      const cls = classes.find((c) => c.id === a.classId);
-                      return (
-                        <tr key={a.id} className="border-b border-line last:border-0">
-                          <td className="py-2.5">
-                            <TextLink href={`/teacher/assignments/${a.id}`}>{a.title}</TextLink>
-                          </td>
-                          <td className="py-2.5 text-ink-2">{cls?.name}</td>
-                          <td className="py-2.5 text-right tabular-nums">
-                            {subs.length}/{cls ? studentsIn(cls.id).length : 0}
-                          </td>
-                          <td className="py-2.5 text-right font-semibold tabular-nums">{pct(avg)}</td>
-                          <td className="py-2.5 text-right text-ink-2">{formatDate(a.dueAt)}</td>
-                        </tr>
-                      );
-                    })}
+                  <tbody className="divide-y divide-line">
+                    {stats.map(({ a, s, due }) => (
+                      <tr key={a.id} className="hover:bg-paper">
+                        <td className="px-5 py-3.5">
+                          <TextLink href={`/teacher/assignments/${a.id}`}>{a.title}</TextLink>
+                        </td>
+                        <td className="px-3 py-3.5 text-ink-2">{classes.find((c) => c.id === a.classId)?.name}</td>
+                        <td className="px-3 py-3.5 text-right tabular-nums">
+                          {s.submittedCount} / {s.classSize}
+                        </td>
+                        <td className="px-3 py-3.5">
+                          <div className="flex items-center gap-2.5">
+                            <div className="h-2 w-24 rounded-sm bg-sunken">
+                              <div className="h-2 rounded-sm bg-primary" style={{ width: `${(s.averageRate ?? 0) * 100}%` }} />
+                            </div>
+                            <span className="font-semibold tabular-nums">{pct(s.averageRate)}</span>
+                          </div>
+                        </td>
+                        <td className="px-5 py-3.5 text-right">
+                          {due ? <Tag tone={due.open ? "caution" : "neutral"}>{due.label}</Tag> : <span className="text-ink-3">없음</span>}
+                        </td>
+                      </tr>
+                    ))}
                   </tbody>
                 </table>
               </div>
             )}
-          </Card>
+          </Panel>
 
-          <Card>
-            <SectionTitle hint="AI가 만든 문항은 검증 결과를 확인하고 '검토 완료'를 체크해야 배포할 수 있어요.">문항 세트</SectionTitle>
+          <Panel title="문항 세트" action={<span className="text-[13px] text-ink-3">검토를 마친 세트만 배포할 수 있습니다</span>} bodyClassName="">
             {sets.length === 0 ? (
-              <Empty>아직 만든 문항 세트가 없습니다.</Empty>
+              <div className="p-5">
+                <Empty>아직 만든 문항 세트가 없습니다.</Empty>
+              </div>
             ) : (
               <ul className="divide-y divide-line">
                 {sets.map((s) => {
@@ -101,58 +133,78 @@ export default async function TeacherDashboard() {
                   const passed = s.items.filter((q) => q.verification.status === "passed").length;
                   const passage = db.passages.find((p) => p.id === s.passageId);
                   return (
-                    <li key={s.id} className="flex flex-wrap items-center gap-3 py-3">
+                    <li key={s.id} className="flex flex-wrap items-center gap-3 px-5 py-3.5">
                       <div className="min-w-0 flex-1">
-                        <TextLink href={`/teacher/sets/${s.id}`}>{s.title}</TextLink>
-                        <div className="mt-0.5 text-xs text-ink-3">
+                        <Link href={`/teacher/sets/${s.id}`} className="font-semibold hover:underline">
+                          {s.title}
+                        </Link>
+                        <div className="mt-0.5 text-[13px] text-ink-3">
                           {passage?.title} · {s.items.length}문항 · 검증 통과 {passed}
-                          {flagged > 0 && <span className="font-semibold text-critical-ink"> · 재검토 {flagged}</span>}
                         </div>
                       </div>
-                      {s.reviewed ? (
-                        <span className="rounded-full bg-green-50 px-2 py-0.5 text-xs font-semibold text-good-ink">✓ 검토 완료</span>
-                      ) : (
-                        <span className="rounded-full bg-amber-50 px-2 py-0.5 text-xs font-semibold text-warning-ink">검토 대기</span>
-                      )}
+                      {flagged > 0 && <Tag tone="wrong">재검토 {flagged}</Tag>}
+                      {s.reviewed ? <Tag tone="correct">검토 완료</Tag> : <Tag tone="caution">검토 대기</Tag>}
+                      <Link href={`/teacher/sets/${s.id}`} className={btn.small}>
+                        {s.reviewed ? "열기" : "검토하기"}
+                      </Link>
                     </li>
                   );
                 })}
               </ul>
             )}
-          </Card>
+          </Panel>
         </div>
 
         <div className="space-y-6">
-          <Card>
-            <SectionTitle hint="학생은 회원가입할 때 참여 코드를 입력해 반에 들어와요.">내 반</SectionTitle>
-            <ul className="space-y-3">
-              {classes.map((c) => {
-                const tally = classSkillSummary(db, c.id);
-                const weak = weakestSkill(tally);
-                return (
-                  <li key={c.id} className="rounded-lg border border-line bg-white p-3">
-                    <div className="flex items-center justify-between">
-                      <TextLink href={`/teacher/classes/${c.id}`}>{c.name}</TextLink>
-                      <span className="text-xs text-ink-2">학생 {studentsIn(c.id).length}명</span>
-                    </div>
-                    <div className="mt-2 flex items-center justify-between text-xs">
-                      <span className="text-ink-2">
-                        참여 코드 <code className="rounded bg-canvas px-1.5 py-0.5 font-bold text-ink">{c.joinCode}</code>
-                      </span>
-                      {weak && (
-                        <span className="text-critical-ink">
-                          약점: {skillLabel(weak)} {pct(rate(tally[weak]))}
-                        </span>
-                      )}
-                    </div>
-                  </li>
-                );
-              })}
-            </ul>
-            <div className="mt-4">
-              <CreateClassForm />
-            </div>
-          </Card>
+          {classes.map((c) => {
+            const tally = classSkillSummary(db, c.id);
+            const weakest = weakestSkill(tally);
+            const rows = SKILLS.filter((s) => tally[s.id].total > 0);
+            return (
+              <Panel
+                key={c.id}
+                title={c.name}
+                action={<span className="text-[13px] text-ink-3">학생 {studentsIn(c.id).length}명</span>}
+                bodyClassName=""
+              >
+                <div className="px-5 pt-4">
+                  <div className="text-[13px] text-ink-3">반 참여 코드</div>
+                  <div className="mt-0.5 font-mono text-[26px] font-bold tracking-[0.12em]">{c.joinCode}</div>
+                </div>
+                {rows.length > 0 && (
+                  <div className="space-y-2 px-5 pt-4 pb-5">
+                    <div className="text-[13px] text-ink-3">영역별 정답률</div>
+                    {rows.map((s) => {
+                      const r = rate(tally[s.id]);
+                      const isWeak = s.id === weakest;
+                      return (
+                        <div key={s.id} className="grid grid-cols-[7.5rem_1fr_2.75rem] items-center gap-2.5 text-[13px]">
+                          <span className={isWeak ? "font-semibold text-wrong" : "text-ink-2"}>{s.label}</span>
+                          <div className="h-2 rounded-sm bg-sunken">
+                            <div className={`h-2 rounded-sm ${isWeak ? "bg-wrong" : "bg-primary"}`} style={{ width: `${(r ?? 0) * 100}%` }} />
+                          </div>
+                          <span className="text-right font-semibold tabular-nums">{pct(r)}</span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+                <div className="flex flex-col gap-2 border-t border-line px-5 py-4">
+                  {weakest && (
+                    <Link href={`/teacher/generate?focusSkill=${weakest}`} className={`${btn.secondary} w-full`}>
+                      {skillLabel(weakest)} 복습 세트 만들기
+                    </Link>
+                  )}
+                  <Link href={`/teacher/classes/${c.id}`} className={`${btn.ghost} w-full`}>
+                    학생별 결과 보기
+                  </Link>
+                </div>
+              </Panel>
+            );
+          })}
+          <Panel title="새 반 만들기">
+            <CreateClassForm />
+          </Panel>
         </div>
       </div>
     </>

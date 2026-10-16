@@ -1,13 +1,26 @@
 import { choiceLabel, choiceTopic } from "@/lib/grading";
 import type { Question } from "@/lib/types";
 
+/** 선지 번호. 화면에서는 원문자(①) 대신 잘 보이는 숫자 원을 씁니다. */
+export function ChoiceNum({ type, index, className = "" }: { type: Question["type"]; index: number; className?: string }) {
+  if (type === "ox") return <span className={`w-6 shrink-0 text-center font-bold ${className}`}>{index === 0 ? "O" : "X"}</span>;
+  return (
+    <span
+      className={`mt-[0.15em] grid h-[22px] w-[22px] shrink-0 place-items-center rounded-full border border-current text-[13px] font-semibold leading-none tabular-nums ${className}`}
+      aria-label={`${index + 1}번`}
+    >
+      {index + 1}
+    </span>
+  );
+}
+
 /** <보기> 상자 */
 export function BogiBox({ text, className = "" }: { text?: string; className?: string }) {
   if (!text) return null;
   return (
-    <div className={`mt-2 rounded-sm border border-ink/40 bg-white px-3 py-2 text-[14px] leading-relaxed ${className}`}>
-      <div className="mb-1 text-xs font-semibold text-ink-2">&lt;보기&gt;</div>
-      <p className="whitespace-pre-wrap">{text}</p>
+    <div className={`mt-3 border border-ink/45 bg-surface px-4 py-3 text-[15px] leading-[1.8] ${className}`}>
+      <div className="mb-1 text-[13px] font-semibold text-ink-2">&lt;보기&gt;</div>
+      <p className="whitespace-pre-wrap font-serif">{text}</p>
     </div>
   );
 }
@@ -16,7 +29,7 @@ export function BogiBox({ text, className = "" }: { text?: string; className?: s
 export function QuestionStem({
   q,
   number,
-  className = "text-[15px] font-medium leading-relaxed",
+  className = "font-serif text-[17px] font-bold leading-[1.65]",
 }: {
   q: Pick<Question, "stem" | "bogi">;
   number?: number;
@@ -25,7 +38,7 @@ export function QuestionStem({
   return (
     <>
       <p className={`whitespace-pre-wrap ${className}`}>
-        {number !== undefined && <span className="mr-1 font-bold">{number}.</span>}
+        {number !== undefined && <span className="mr-1.5 text-primary">{number}.</span>}
         {q.stem}
       </p>
       <BogiBox text={q.bogi} />

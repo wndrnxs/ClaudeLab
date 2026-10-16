@@ -21,7 +21,7 @@ export default async function GeneratePage({
     <>
       <PageTitle
         title="문항 만들기"
-        sub="AI가 문항을 만들고, 정답을 가린 채 다시 풀어 보며 근거와 복수 정답 여부를 검증합니다."
+        sub="AI가 만든 문항을 정답을 가린 채 다시 풀어 보고, 근거 문장과 복수 정답 여부를 확인합니다."
       />
       <GenerateForm
         passages={passages}
