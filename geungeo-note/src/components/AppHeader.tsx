@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { demoLoginEnabled } from "@/lib/demo";
 import type { User } from "@/lib/types";
 import { LogoutButton } from "./LogoutButton";
 
@@ -45,7 +46,7 @@ export function AppHeader({ user, aiMode }: { user: User; aiMode?: "claude" | "d
           <span className="hidden text-ink-2 sm:inline">
             {user.name} {user.role === "teacher" ? "선생님" : "학생"}
           </span>
-          <LogoutButton />
+          <LogoutButton label={demoLoginEnabled() ? "⇄ 역할 바꾸기" : "로그아웃"} />
         </div>
       </div>
     </header>
