@@ -13,8 +13,8 @@ const Body = z.object({
   reviewed: z.boolean().optional(),
 });
 
-function contentKey(q: Pick<Question, "stem" | "choices" | "answerIndex" | "evidence" | "type">): string {
-  return JSON.stringify([q.type, q.stem, q.choices, q.answerIndex, q.evidence]);
+function contentKey(q: Pick<Question, "stem" | "bogi" | "choices" | "answerIndex" | "evidence" | "type">): string {
+  return JSON.stringify([q.type, q.stem, q.bogi ?? "", q.choices, q.answerIndex, q.evidence]);
 }
 
 export const PATCH = route(async (req, { params }: IdCtx) => {

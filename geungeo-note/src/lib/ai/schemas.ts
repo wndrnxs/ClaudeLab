@@ -4,7 +4,8 @@ import { SKILL_IDS } from "../skills";
 /** Claude가 돌려줄 문항 형식(구조화 출력). 최종 검사는 normalize 단계에서 다시 합니다. */
 export const GeneratedQuestionSchema = z.object({
   type: z.enum(["mcq", "ox"]),
-  stem: z.string().describe("발문. <보기>가 필요하면 발문 안에 함께 씁니다."),
+  stem: z.string().describe("발문. <보기>의 내용은 여기에 넣지 않습니다."),
+  bogi: z.string().describe("<보기> 상자에 들어갈 내용('<보기>'라는 제목은 빼고). <보기>가 없으면 빈 문자열"),
   choices: z.array(z.string()).describe("mcq는 선지 5개, ox는 [\"O\", \"X\"]"),
   answerIndex: z.number().int().describe("정답 선지의 0부터 시작하는 번호"),
   explanation: z.string().describe("학생용 해설 2~3문장"),

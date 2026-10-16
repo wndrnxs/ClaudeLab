@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { CONFIDENCE_LABEL } from "@/components/badges";
 import { PassageView } from "@/components/PassageView";
+import { QuestionStem } from "@/components/QuestionParts";
 import { btn, input } from "@/components/ui";
 import { postJson } from "@/lib/client";
 import { CHOICE_MARKS } from "@/lib/grading";
@@ -13,6 +14,7 @@ interface PublicQuestion {
   id: string;
   type: QuestionType;
   stem: string;
+  bogi?: string;
   choices: string[];
 }
 
@@ -100,10 +102,7 @@ export function TakeAssignment({
             return (
               <fieldset key={q.id} id={`q-${q.id}`} className="rounded-xl border border-line bg-white p-4">
                 <legend className="sr-only">{i + 1}번 문항</legend>
-                <p className="whitespace-pre-wrap text-[15px] font-medium leading-relaxed">
-                  <span className="mr-1 font-bold">{i + 1}.</span>
-                  {q.stem}
-                </p>
+                <QuestionStem q={q} number={i + 1} />
                 <div className={`mt-3 ${q.type === "ox" ? "grid grid-cols-2 gap-2" : "space-y-1.5"}`}>
                   {q.choices.map((c, idx) => (
                     <label

@@ -30,6 +30,16 @@ export function QuestionEditForm({
           <textarea className={`${input} min-h-20`} value={draft.stem} onChange={(e) => update({ stem: e.target.value })} />
         </label>
 
+        <label className="block">
+          <span className="mb-1 block font-semibold">&lt;보기&gt; (선택)</span>
+          <textarea
+            className={`${input} min-h-16`}
+            placeholder="<보기>가 필요한 문항이면 내용을 적으세요. 비워 두면 <보기> 없이 출제됩니다."
+            value={draft.bogi ?? ""}
+            onChange={(e) => update({ bogi: e.target.value })}
+          />
+        </label>
+
         <fieldset>
           <legend className="mb-1 font-semibold">선지 · 정답 · 선지별 근거</legend>
           <div className="space-y-2">

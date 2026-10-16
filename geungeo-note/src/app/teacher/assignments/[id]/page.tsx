@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ConfidenceBadge, SkillBadge } from "@/components/badges";
 import { PassageView } from "@/components/PassageView";
+import { AnswerExplanation, QuestionStem } from "@/components/QuestionParts";
 import { Bar, Card, PageTitle, SectionTitle, Stat, TextLink, btn, formatDate, pct } from "@/components/ui";
 import { assignmentStats, rate, weakestSkill } from "@/lib/analytics";
 import { requireRole } from "@/lib/auth";
@@ -124,7 +125,9 @@ export default async function AssignmentStatsPage({ params }: { params: Promise<
                     <span className="text-ink-3"> ({qs.correct}/{qs.responses})</span>
                   </span>
                 </header>
-                <p className="mb-3 whitespace-pre-wrap text-sm font-medium">{q.stem}</p>
+                <div className="mb-3">
+                  <QuestionStem q={q} className="text-sm font-medium" />
+                </div>
 
                 <div className="space-y-2">
                   {qs.choices.map((c) => (
@@ -193,7 +196,9 @@ export default async function AssignmentStatsPage({ params }: { params: Promise<
 
                 <details className="mt-3 text-xs text-ink-2">
                   <summary className="cursor-pointer">해설·근거 보기</summary>
-                  <p className="mt-1">{q.explanation}</p>
+                  <div className="mt-1">
+                    <AnswerExplanation q={q} compact />
+                  </div>
                   <p className="mt-1">근거: “{q.evidence.join("” / “")}”</p>
                 </details>
               </Card>

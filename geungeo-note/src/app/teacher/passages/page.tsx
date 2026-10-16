@@ -4,6 +4,7 @@ import { Card, PageTitle, SectionTitle, btn } from "@/components/ui";
 import { requireRole } from "@/lib/auth";
 import { readDb } from "@/lib/db";
 import type { Passage } from "@/lib/types";
+import { CompositeForm } from "./CompositeForm";
 import { PassageForm } from "./PassageForm";
 
 function PassageCard({ p }: { p: Passage }) {
@@ -13,6 +14,7 @@ function PassageCard({ p }: { p: Passage }) {
         <h3 className="font-bold">{p.title}</h3>
         <span className="text-sm text-ink-2">{p.author}</span>
         <span className="rounded bg-canvas px-1.5 py-0.5 text-xs text-ink-2">{p.genre}</span>
+        {p.sources && <span className="rounded bg-brand-50 px-1.5 py-0.5 text-xs text-brand-800">복합 지문</span>}
       </div>
       <p className="mt-2 line-clamp-3 flex-1 whitespace-pre-line text-sm text-ink-2">{p.text}</p>
       <div className="mt-3 flex items-center justify-between gap-2">
@@ -62,10 +64,22 @@ export default async function PassagesPage() {
             )}
           </section>
         </div>
-        <Card className="h-fit lg:sticky lg:top-20">
-          <SectionTitle>지문 등록</SectionTitle>
-          <PassageForm />
-        </Card>
+        <div className="h-fit space-y-6">
+          <Card>
+            <SectionTitle hint="이미 등록된 두 작품을 (가), (나)로 묶습니다. 권리 근거는 원래 지문을 그대로 따릅니다.">
+              복합 지문 만들기
+            </SectionTitle>
+            <CompositeForm
+              passages={[...library, ...mine]
+                .filter((p) => !p.sources)
+                .map((p) => ({ id: p.id, title: p.title, author: p.author }))}
+            />
+          </Card>
+          <Card>
+            <SectionTitle>지문 등록</SectionTitle>
+            <PassageForm />
+          </Card>
+        </div>
       </div>
     </>
   );

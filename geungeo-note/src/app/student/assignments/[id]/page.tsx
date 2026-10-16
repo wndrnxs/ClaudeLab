@@ -29,7 +29,7 @@ export default async function StudentAssignmentPage({ params }: { params: Promis
           passage={passage}
           requireReason={assignment.requireReason}
           // 제출 전에는 정답·해설·근거를 브라우저로 보내지 않습니다.
-          items={assignment.items.map((q) => ({ id: q.id, type: q.type, stem: q.stem, choices: q.choices }))}
+          items={assignment.items.map((q) => ({ id: q.id, type: q.type, stem: q.stem, bogi: q.bogi, choices: q.choices }))}
         />
       )}
     </>

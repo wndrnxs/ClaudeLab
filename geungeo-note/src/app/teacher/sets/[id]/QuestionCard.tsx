@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { AnswerExplanation, QuestionStem } from "@/components/QuestionParts";
 import { SkillBadge, VerificationBadge } from "@/components/badges";
 import { btn } from "@/components/ui";
 import { choiceLabel } from "@/lib/grading";
@@ -48,7 +49,7 @@ export function QuestionCard({
         </span>
       </header>
 
-      <p className="whitespace-pre-wrap text-[15px] font-medium leading-relaxed">{q.stem}</p>
+      <QuestionStem q={q} />
 
       <ol className="mt-3 space-y-1.5">
         {q.choices.map((c, i) => {
@@ -72,7 +73,7 @@ export function QuestionCard({
       </ol>
 
       <div className="mt-3 rounded-lg bg-canvas px-3 py-2 text-sm leading-relaxed">
-        <span className="font-semibold">해설</span> {q.explanation}
+        <AnswerExplanation q={q} />
       </div>
 
       <div className="mt-2 text-xs text-ink-2">

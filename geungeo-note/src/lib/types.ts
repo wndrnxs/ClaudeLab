@@ -38,6 +38,8 @@ export interface Passage {
   author: string;
   genre: Genre;
   text: string;
+  /** 복합 지문이면 (가), (나) 각 작품의 출처 */
+  sources?: { label: string; title: string; author: string }[];
   rights: {
     kind: RightsKind;
     note: string;
@@ -75,10 +77,13 @@ export interface Question {
   id: string;
   type: QuestionType;
   stem: string;
+  /** <보기> 내용(없으면 undefined). 발문과 따로 두어 상자로 표시합니다. */
+  bogi?: string;
   choices: string[];
   answerIndex: number;
+  /** 정답 해설 */
   explanation: string;
-  /** 선지별 판단 근거(왜 맞고 왜 틀린지) */
+  /** 선지별 판단 근거. 정답이 아닌 선지의 근거가 '오답 풀이'가 됩니다. */
   choiceNotes: string[];
   /** 지문에서 그대로 인용한 근거 문장 */
   evidence: string[];
@@ -92,6 +97,10 @@ export interface GenerationSpec {
   oxCount: number;
   difficulty: Difficulty;
   focusSkill?: SkillId;
+  /** <보기>를 활용하는 문항 수 */
+  bogiCount?: number;
+  /** '적절하지 않은 것은?' 같은 부정 발문을 섞을지 */
+  mixNegative?: boolean;
   note?: string;
 }
 

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { CONFIDENCE_LABEL, ResultMark, SkillBadge } from "@/components/badges";
 import { PassageView } from "@/components/PassageView";
+import { AnswerExplanation, QuestionStem } from "@/components/QuestionParts";
 import { btn } from "@/components/ui";
 import { choiceLabel } from "@/lib/grading";
 import type { Passage, Question, Submission } from "@/lib/types";
@@ -69,7 +70,7 @@ export function ResultView({
                     <span className="text-xs font-semibold text-critical-ink">! 확신하고 틀렸어요 — 꼭 다시 보세요</span>
                   )}
                 </header>
-                <p className="whitespace-pre-wrap text-[15px] font-medium leading-relaxed">{q.stem}</p>
+                <QuestionStem q={q} />
                 <ol className="mt-2 space-y-1">
                   {q.choices.map((c, idx) => {
                     const isAnswer = idx === q.answerIndex;
@@ -100,7 +101,7 @@ export function ResultView({
                   <div className="mt-1 text-xs text-critical-ink">→ 내 답이 틀린 이유: {q.choiceNotes[a.choiceIndex]}</div>
                 )}
                 <div className="mt-2 rounded-lg bg-canvas px-3 py-2 text-sm leading-relaxed">
-                  <b>해설</b> {q.explanation}
+                  <AnswerExplanation q={q} />
                 </div>
               </article>
             );

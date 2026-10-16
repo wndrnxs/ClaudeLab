@@ -59,7 +59,37 @@ mark.evidence {
   padding: 0 1px;
 }
 
+/* 시험지(인쇄) 형식: 명조 계열 글꼴, 2단 편집 */
+.exam {
+  font-family: "Noto Serif KR", "Nanum Myeongjo", "AppleMyungjo", "Batang", serif;
+  /* 시험지처럼 글자 단위로 줄을 바꿔 양쪽 정렬 시 생기는 큰 빈칸을 막습니다. */
+  word-break: break-all;
+}
+.exam .passage-text {
+  word-break: break-all;
+}
+.exam-columns {
+  column-gap: 2.25rem;
+  column-rule: 1px solid #b9b8b2;
+}
+@media (min-width: 768px) {
+  .exam-columns {
+    column-count: 2;
+  }
+}
+.exam-item {
+  break-inside: avoid;
+}
+.passage-label {
+  display: inline-block;
+  font-weight: 700;
+  margin-top: 0.25rem;
+}
+
 @media print {
+  .exam-columns {
+    column-count: 2;
+  }
   body {
     background: white;
   }

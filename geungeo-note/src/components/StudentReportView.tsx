@@ -4,6 +4,7 @@ import { choiceLabel } from "@/lib/grading";
 import { SKILL_MAP } from "@/lib/skills";
 import type { Confidence } from "@/lib/types";
 import { CONFIDENCE_LABEL, SkillBadge } from "./badges";
+import { QuestionStem } from "./QuestionParts";
 import { Bar, Card, Empty, SectionTitle, Stat, formatDate, pct } from "./ui";
 
 /** 학생 약점 분석 화면. 학생 본인과 담당 교사가 같은 화면을 봅니다. */
@@ -108,7 +109,7 @@ export function StudentReportView({ report, viewer }: { report: StudentReport; v
                   {w.confidence === "sure" && <span className="font-semibold text-critical-ink">! 확신하고 틀림</span>}
                   <span>{formatDate(w.submittedAt)}</span>
                 </div>
-                <p className="whitespace-pre-wrap font-medium">{w.question.stem}</p>
+                <QuestionStem q={w.question} className="font-medium" />
                 <div className="mt-2 grid gap-2 md:grid-cols-2">
                   <div className="rounded-md bg-red-50 p-2">
                     <div className="text-xs font-semibold text-critical-ink">

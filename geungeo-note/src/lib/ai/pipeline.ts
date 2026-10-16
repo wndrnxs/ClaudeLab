@@ -55,6 +55,7 @@ export function normalizeGenerated(g: GeneratedQuestion): { question: Question; 
     id: newId("q"),
     type: g.type,
     stem: g.stem.trim(),
+    bogi: g.bogi.trim() || undefined,
     choices,
     answerIndex,
     explanation: g.explanation.trim(),
@@ -215,7 +216,8 @@ export async function buildInsights(stats: AssignmentStats): Promise<AssignmentI
             c.reasons.map((r) => `    - [${confidenceLabel[r.confidence]}] ${r.reason || "(이유 없음)"}`).join("\n"),
         )
         .join("\n");
-      return `문항 ${s.number}. ${q.stem}\n${choices}\n해설: ${q.explanation}\n응답 ${s.responses}명, 정답 ${s.correct}명\n${wrong}`;
+      const bogi = q.bogi ? `\n<보기> ${q.bogi}` : "";
+      return `문항 ${s.number}. ${q.stem}${bogi}\n${choices}\n해설: ${q.explanation}\n응답 ${s.responses}명, 정답 ${s.correct}명\n${wrong}`;
     })
     .join("\n\n");
   const output = await callStructured({

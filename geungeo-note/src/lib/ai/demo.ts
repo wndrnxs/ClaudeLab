@@ -19,9 +19,12 @@ function cloneWithNewId(q: Question): Question {
 
 function fromBank(passageId: string, type: QuestionType, count: number, spec: GenerationSpec, excludeStems: Set<string>): Question[] {
   const bank = (QUESTION_BANK[passageId] ?? []).filter((q) => q.type === type && !excludeStems.has(q.stem));
-  const focused = spec.focusSkill ? bank.filter((q) => q.skill === spec.focusSkill) : [];
-  const rest = bank.filter((q) => !focused.includes(q));
-  return [...focused, ...rest].slice(0, count).map(cloneWithNewId);
+  const withBogi = type === "mcq" && spec.bogiCount ? bank.filter((q) => q.bogi).slice(0, spec.bogiCount) : [];
+  const focused = spec.focusSkill ? bank.filter((q) => q.skill === spec.focusSkill && !withBogi.includes(q)) : [];
+  const rest = bank.filter((q) => !focused.includes(q) && !withBogi.includes(q));
+  const picked = new Set([...withBogi, ...focused, ...rest].slice(0, count));
+  // 고른 문항은 은행에 실린 순서(쉬운 문항 → <보기> 문항)대로 배치합니다.
+  return bank.filter((q) => picked.has(q)).map(cloneWithNewId);
 }
 
 /* ── 규칙 기반 생성 ── */

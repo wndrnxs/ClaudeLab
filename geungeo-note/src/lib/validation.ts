@@ -6,6 +6,8 @@ export const SpecSchema = z.object({
   oxCount: z.number().int().min(0).max(10),
   difficulty: z.enum(["하", "중", "상"]),
   focusSkill: z.enum(SKILL_IDS).optional(),
+  bogiCount: z.number().int().min(0).max(5).optional(),
+  mixNegative: z.boolean().optional(),
   note: z.string().max(300).optional(),
 });
 
@@ -15,6 +17,12 @@ export const EditableQuestionSchema = z
     id: z.string().min(1),
     type: z.enum(["mcq", "ox"]),
     stem: z.string().trim().min(1, "발문을 입력해 주세요.").max(2000),
+    bogi: z
+      .string()
+      .trim()
+      .max(2000)
+      .optional()
+      .transform((v) => v || undefined),
     choices: z.array(z.string().trim().min(1, "빈 선지가 있습니다.").max(500)).min(2).max(5),
     answerIndex: z.number().int().min(0),
     explanation: z.string().max(2000),

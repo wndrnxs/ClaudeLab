@@ -27,6 +27,8 @@ export function GenerateForm({
   const [oxCount, setOxCount] = useState(2);
   const [difficulty, setDifficulty] = useState<Difficulty>("중");
   const [focusSkill, setFocusSkill] = useState<SkillId | "">(initialSkill ?? "");
+  const [bogiCount, setBogiCount] = useState(1);
+  const [mixNegative, setMixNegative] = useState(true);
   const [note, setNote] = useState("");
   const [pending, setPending] = useState(false);
   const [step, setStep] = useState(0);
@@ -53,7 +55,15 @@ export function GenerateForm({
             try {
               const { id } = await postJson<{ id: string; warnings: string[] }>("/api/sets", {
                 passageId,
-                spec: { mcqCount, oxCount, difficulty, focusSkill: focusSkill || undefined, note: note || undefined },
+                spec: {
+                  mcqCount,
+                  oxCount,
+                  difficulty,
+                  focusSkill: focusSkill || undefined,
+                  bogiCount: Math.min(bogiCount, mcqCount),
+                  mixNegative,
+                  note: note || undefined,
+                },
               });
               router.push(`/teacher/sets/${id}`);
             } catch (err) {
@@ -92,6 +102,22 @@ export function GenerateForm({
               </select>
             </label>
           </div>
+
+          <fieldset className="grid grid-cols-[auto_1fr] items-center gap-x-3 gap-y-2 rounded-lg border border-line p-3 text-sm">
+            <legend className="px-1 font-semibold">수능형 출제 옵션</legend>
+            <label htmlFor="bogiCount" className="text-ink-2">&lt;보기&gt; 활용 문항</label>
+            <select id="bogiCount" className={input} value={bogiCount} onChange={(e) => setBogiCount(Number(e.target.value))}>
+              {[0, 1, 2, 3].map((n) => (
+                <option key={n} value={n}>
+                  {n === 0 ? "넣지 않음" : `${n}문항`}
+                </option>
+              ))}
+            </select>
+            <label className="col-span-2 flex items-center gap-2 text-ink-2">
+              <input type="checkbox" checked={mixNegative} onChange={(e) => setMixNegative(e.target.checked)} />
+              &lsquo;적절하지 않은 것은?&rsquo; 발문 섞기
+            </label>
+          </fieldset>
 
           <label className="block text-sm">
             <span className="mb-1 block font-semibold">집중할 평가 요소 (선택)</span>

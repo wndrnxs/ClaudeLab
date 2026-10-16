@@ -46,18 +46,25 @@ describe("검증 결과 판정", () => {
 });
 
 describe("AI 출력 정리", () => {
+  const gen = { ...base, bogi: "" };
+
+  it("<보기>가 비어 있으면 없는 것으로, 있으면 따로 보관한다", () => {
+    expect(normalizeGenerated(gen).question.bogi).toBeUndefined();
+    expect(normalizeGenerated({ ...gen, bogi: "  관점 설명  " }).question.bogi).toBe("관점 설명");
+  });
+
   it("선지 수가 틀리면 형식 문제로 기록한다", () => {
-    const { issues } = normalizeGenerated({ ...base, choices: ["가", "나", "다"], choiceNotes: ["", "", ""] });
+    const { issues } = normalizeGenerated({ ...gen, choices: ["가", "나", "다"], choiceNotes: ["", "", ""] });
     expect(issues.join(" ")).toContain("3개");
   });
 
   it("OX 선지는 항상 O, X로 맞춘다", () => {
-    const { question } = normalizeGenerated({ ...base, type: "ox", choices: ["참", "거짓"], answerIndex: 1, choiceNotes: ["", ""] });
+    const { question } = normalizeGenerated({ ...gen, type: "ox", choices: ["참", "거짓"], answerIndex: 1, choiceNotes: ["", ""] });
     expect(question.choices).toEqual(["O", "X"]);
   });
 
   it("범위를 벗어난 정답 번호를 잡아낸다", () => {
-    const { issues } = normalizeGenerated({ ...base, answerIndex: 7 });
+    const { issues } = normalizeGenerated({ ...gen, answerIndex: 7 });
     expect(issues.join(" ")).toContain("범위");
   });
 });
@@ -68,8 +75,14 @@ describe("데모 생성기", () => {
     const result = demoGenerate(passage, { mcqCount: 3, oxCount: 2, difficulty: "중", focusSkill: "inference" });
     expect(result.items.filter((q) => q.type === "mcq")).toHaveLength(3);
     expect(result.items.filter((q) => q.type === "ox")).toHaveLength(2);
-    expect(result.items[0].skill).toBe("inference");
+    expect(result.items.some((q) => q.skill === "inference")).toBe(true);
     expect(new Set(result.items.map((q) => q.id)).size).toBe(5);
+  });
+
+  it("<보기> 문항 수를 요청하면 <보기>가 있는 예시 문항을 포함한다", () => {
+    const passage = LIBRARY_PASSAGES.find((p) => p.id === "lib_jdl_seosi")!;
+    const result = demoGenerate(passage, { mcqCount: 3, oxCount: 0, difficulty: "상", bogiCount: 1 });
+    expect(result.items.filter((q) => q.bogi)).toHaveLength(1);
   });
 
   it("직접 등록한 지문은 규칙 기반 문항을 만들고 근거는 지문에 있다", () => {
