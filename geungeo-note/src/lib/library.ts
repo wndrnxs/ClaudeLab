@@ -72,7 +72,7 @@ export const LIBRARY_PASSAGES: Passage[] = [
     id: "lib_heat_island",
     ownerId: null,
     title: "도시 열섬 현상",
-    author: "근거노트 편집부",
+    author: "클래스픽 편집부",
     genre: "독서",
     text: [
       "도시의 기온이 주변 교외 지역보다 높게 나타나는 현상을 도시 열섬 현상이라고 한다. 기온 분포를 지도에 등온선으로 그려 보면 도시 중심부가 마치 바다 위에 떠 있는 섬처럼 높은 기온으로 둘러싸여 나타나기 때문에 이러한 이름이 붙었다.",
@@ -87,7 +87,7 @@ export const LIBRARY_PASSAGES: Passage[] = [
     ].join("\n"),
     rights: {
       kind: "original",
-      note: "근거노트 편집부 자체 집필 지문(데모용).",
+      note: "클래스픽 편집부 자체 집필 지문(데모용).",
       confirmedAt: LIBRARY_CONFIRMED_AT,
     },
     createdAt: LIBRARY_CONFIRMED_AT,

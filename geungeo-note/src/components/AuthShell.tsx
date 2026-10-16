@@ -6,7 +6,7 @@ export function AuthShell({ title, children }: { title: string; children: ReactN
     <main className="min-h-screen px-5 py-12 sm:py-20">
       <div className="mx-auto w-full max-w-[440px]">
         <div className="mb-8">
-          <Wordmark size="lg" />
+          <Wordmark size="lg" withLatin />
           <p className="mt-4 text-sm leading-relaxed text-ink-2">
             지문을 근거로 문항을 만들고 검증합니다.
             <br />
