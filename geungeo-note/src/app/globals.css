@@ -1,0 +1,72 @@
+@import "tailwindcss";
+
+/*
+ * 디자인 토큰. 경쟁 서비스와 혼동되지 않도록 청록(teal) 계열을 브랜드 색으로 씁니다.
+ * 차트 색은 색각 이상 검증을 통과한 기준 팔레트를 그대로 사용합니다.
+ */
+@theme {
+  --font-sans: "Pretendard", "Apple SD Gothic Neo", "Malgun Gothic", "Noto Sans KR", system-ui, sans-serif;
+
+  --color-brand-50: #f0fdfa;
+  --color-brand-100: #ccfbf1;
+  --color-brand-600: #0d9488;
+  --color-brand-700: #0f766e;
+  --color-brand-800: #115e59;
+
+  --color-surface: #fcfcfb;
+  --color-canvas: #f5f5f3;
+  --color-line: #e4e3df;
+  --color-ink: #0b0b0b;
+  --color-ink-2: #52514e;
+  --color-ink-3: #77766f;
+
+  /* 차트: 계열 1(나/정답률), 계열 2(반 평균) */
+  --color-series-1: #2a78d6;
+  --color-series-2: #eb6834;
+  --color-grid: #ebeae6;
+
+  /* 상태 색: 항상 아이콘·글자와 함께 씁니다 */
+  --color-good: #0ca30c;
+  --color-good-ink: #006300;
+  --color-warning: #fab219;
+  --color-warning-ink: #8a5a00;
+  --color-critical: #d03b3b;
+  --color-critical-ink: #a32222;
+}
+
+html {
+  color-scheme: light;
+}
+
+body {
+  background: var(--color-canvas);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+.passage-text {
+  white-space: pre-wrap;
+  word-break: keep-all;
+  line-height: 1.9;
+}
+
+mark.evidence {
+  background: #fff1b8;
+  color: inherit;
+  border-radius: 3px;
+  box-shadow: 0 0 0 1px #f2d16b;
+  padding: 0 1px;
+}
+
+@media print {
+  body {
+    background: white;
+  }
+  .no-print {
+    display: none !important;
+  }
+  .print-break {
+    break-inside: avoid;
+  }
+}
